@@ -23,7 +23,7 @@
  */
 
 /**
- * Ems carrier model
+ * Oggetto carrier model
  *
  * @category   Oggetto
  * @package    Oggetto_Shipping
