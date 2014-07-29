@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<!--
+/**
+* Oggetto Web shipping extension for Magento
+*
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Open Software License (OSL 3.0)
+* that is bundled with this package in the file LICENSE.txt.
+* It is also available through the world-wide-web at this URL:
+* http://opensource.org/licenses/osl-3.0.php
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade
+* the Oggetto Shipping module to newer versions in the future.
+* If you wish to customize the Oggetto Shipping module for your needs
+* please refer to http://www.magentocommerce.com for more information.
+*
+* @category   Oggetto
+* @package    Oggetto_Shipping
+* @copyright  Copyright (C) 2014 Oggetto Web ltd (http://oggettoweb.com/)
+* @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+*/
+-->
+<config>
+    <modules>
+        <Oggetto_Shipping>
+            <version>0.1.0</version>
+        </Oggetto_Shipping>
+    </modules>
+    <global>
+        <models>
+            <oggettoshipping>
+                <class>Oggetto_Shipping_Model</class>
+            </oggettoshipping>
+        </models>
+        <helpers>
+            <oggettoshipping>
+                <class>Oggetto_Shipping_Helper</class>
+            </oggettoshipping>
+        </helpers>
+        <resources>
+            <oggettoshipping_setup>
+                <setup>
+                    <module>Oggetto_Shipping</module>
+                </setup>
+            </oggettoshipping_setup>
+        </resources>
+    </global>
+    <default>
+        <carriers>
+            <oggetto>
+                <active>1</active>
+                <model>oggettoshipping/carrier_oggetto</model>
+                <title>Oggetto</title>
+                <sort_order>10</sort_order>
+                <sallowspecific>1</sallowspecific>
+            </oggetto>
+        </carriers>
+    </default>
+    <frontend>
+        <translate>
+            <modules>
+                <Oggetto_Shipping>
+                    <files>
+                        <default>Oggetto_Shipping.csv</default>
+                    </files>
+                </Oggetto_Shipping>
+            </modules>
+        </translate>
+    </frontend>
+    <adminhtml>
+        <translate>
+            <modules>
+                <Oggetto_Shipping>
+                    <files>
+                        <default>Oggetto_Shipping.csv</default>
+                    </files>
+                </Oggetto_Shipping>
+            </modules>
+        </translate>
+    </adminhtml>
+</config>
