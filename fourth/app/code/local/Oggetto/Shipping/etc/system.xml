@@ -27,7 +27,7 @@
     <sections>
         <carriers translate="label" module="shipping">
             <groups>
-                <oggettoshipping translate="label">
+                <oggetto translate="label">
                     <label>Oggetto</label>
                     <frontend_type>text</frontend_type>
                     <sort_order>9</sort_order>
@@ -81,7 +81,7 @@
                             <can_be_empty>1</can_be_empty>
                         </specificcountry>
                     </fields>
-                </oggettoshipping>
+                </oggetto>
             </groups>
         </carriers>
     </sections>

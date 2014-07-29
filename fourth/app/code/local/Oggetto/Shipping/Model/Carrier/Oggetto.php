@@ -32,7 +32,17 @@
  */
 class Oggetto_Shipping_Model_Carrier_Oggetto extends Mage_Shipping_Model_Carrier_Abstract
 {
+    /**
+     * @var string Carrier code
+     */
     protected $_code = 'oggetto';
+
+    /**
+     * @var array Available country names
+     */
+    protected $_countryNames = [
+        'RU' => 'Россия'
+    ];
 
     /**
      * Get this module helper
@@ -68,8 +78,8 @@ class Oggetto_Shipping_Model_Carrier_Oggetto extends Mage_Shipping_Model_Carrier
             'city'      => $request->getDestCity()
         ];
 
-        $this->_translateLocationIdsToNames($orig);
-        $this->_translateLocationIdsToNames($dest);
+        $orig = $this->_translateLocationIdsToNames($orig);
+        $dest = $this->_translateLocationIdsToNames($dest);
 
         /** @var Mage_Shipping_Model_Rate_Result $result */
         $result = Mage::getModel('shipping/rate_result');
@@ -84,6 +94,9 @@ class Oggetto_Shipping_Model_Carrier_Oggetto extends Mage_Shipping_Model_Carrier
             'currency_code' => Mage::app()->getStore()->getCurrentCurrency()
         ]);
         $rateFromBaseToRub = $currency->getRate('RUB');
+        if (!$rateFromBaseToRub) {
+            return false;
+        }
 
         foreach ($this->getAllowedMethods() as $method => $title) {
             $price = round($prices[$method] / $rateFromBaseToRub, 2);
@@ -97,13 +110,27 @@ class Oggetto_Shipping_Model_Carrier_Oggetto extends Mage_Shipping_Model_Carrier
      * Translate ids to names of country and region
      *
      * @param $address Array contain country and region
+     * @return array Translated locations array
      */
     protected function _translateLocationIdsToNames($address)
     {
         foreach (['country', 'region'] as $location) {
             $model = Mage::getModel("directory/{$location}");
-            $address[$location] = $model->load($address[$location])->getDefaultName();
+            $name = $model->load($address[$location])->getDefaultName();
+            $address[$location] = is_null($name) ? $this->_countryIdTranslator($address[$location]) : $name;
         }
+        return $address;
+    }
+
+    /**
+     * Get name of country by ID
+     *
+     * @param $id string Country ID
+     * @return string|null Country name
+     */
+    protected function _countryIdTranslator($id)
+    {
+        return isset($this->_countryNames[$id]) ? $this->_countryNames[$id] : null;
     }
 
     protected function _getRateMethod($method, $price)
