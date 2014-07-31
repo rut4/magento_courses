@@ -1,0 +1,138 @@
+<?xml version="1.0"?>
+<!--
+/**
+* Oggetto Web extension for Magento
+*
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Open Software License (OSL 3.0)
+* that is bundled with this package in the file LICENSE.txt.
+* It is also available through the world-wide-web at this URL:
+* http://opensource.org/licenses/osl-3.0.php
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade
+* the Oggetto Interview module to newer versions in the future.
+* If you wish to customize the Oggetto Interview module for your needs
+* please refer to http://www.magentocommerce.com for more information.
+*
+* @category   Oggetto
+* @package    Oggetto_Interview
+* @copyright  Copyright (C) 2014 Oggetto Web ltd (http://oggettoweb.com/)
+* @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+*/
+-->
+<config>
+    <modules>
+        <Oggetto_Interview>
+            <version>0.2.0</version>
+        </Oggetto_Interview>
+    </modules>
+    <global>
+        <models>
+            <interview>
+                <class>Oggetto_Interview_Model</class>
+                <resourceModel>interview_resource</resourceModel>
+            </interview>
+            <interview_resource>
+                <class>Oggetto_Interview_Model_Resource</class>
+                <entities>
+                    <question>
+                        <table>interview_questions</table>
+                    </question>
+                </entities>
+            </interview_resource>
+        </models>
+        <resources>
+            <interview_setup>
+                <setup>
+                    <module>Oggetto_Interview</module>
+                </setup>
+            </interview_setup>
+        </resources>
+        <blocks>
+            <interview>
+                <class>Oggetto_Interview_Block</class>
+            </interview>
+        </blocks>
+        <helpers>
+            <interview>
+                <class>Oggetto_Interview_Helper</class>
+            </interview>
+        </helpers>
+    </global>
+    <frontend>
+        <layout>
+            <updates>
+                <interview>
+                    <file>interview.xml</file>
+                </interview>
+            </updates>
+        </layout>
+        <routers>
+            <interview>
+                <use>standard</use>
+                <args>
+                    <module>Oggetto_Interview</module>
+                    <frontName>interview</frontName>
+                </args>
+            </interview>
+        </routers>
+        <translate>
+            <modules>
+                <Oggetto_Interview>
+                    <files>
+                        <default>Oggetto_Interview.csv</default>
+                    </files>
+                </Oggetto_Interview>
+            </modules>
+        </translate>
+    </frontend>
+    <adminhtml>
+        <layout>
+            <updates>
+                <interview>
+                    <file>interview.xml</file>
+                </interview>
+            </updates>
+        </layout>
+        <menu>
+            <customer>
+                <children>
+                    <question translate="label" module="interview">
+                        <sort_order>10</sort_order>
+                        <title>Questions</title>
+                        <action>adminhtml/question</action>
+                    </question>
+                </children>
+            </customer>
+        </menu>
+        <acl>
+            <resources>
+                <admin>
+                    <children>
+                        <customer>
+                            <children>
+                                <question>
+                                    <title>Quetions</title>
+                                </question>
+                            </children>
+                        </customer>
+                    </children>
+                </admin>
+            </resources>
+        </acl>
+    </adminhtml>
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <Oggetto_Interview>Oggetto_Interview_Adminhtml</Oggetto_Interview>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
+</config>
