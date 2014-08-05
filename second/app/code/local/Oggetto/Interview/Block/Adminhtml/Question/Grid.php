@@ -33,6 +33,9 @@
 
 class Oggetto_Interview_Block_Adminhtml_Question_Grid extends Mage_Adminhtml_Block_Widget_Grid
 {
+    /**
+     * Class constructor
+     */
     public function __constructor()
     {
         parent::__construct();
@@ -44,11 +47,19 @@ class Oggetto_Interview_Block_Adminhtml_Question_Grid extends Mage_Adminhtml_Blo
 
     }
 
+    /**
+     * @return string Question collection class name
+     */
     protected function _getCollectionClass()
     {
         return 'interview/question_collection';
     }
 
+    /**
+     * Prepare collection
+     *
+     * @return Mage_Adminhtml_Block_Widget_Grid Block with prepared collection
+     */
     protected function _prepareCollection()
     {
         $collection = Mage::getResourceModel($this->_getCollectionClass());
@@ -57,6 +68,11 @@ class Oggetto_Interview_Block_Adminhtml_Question_Grid extends Mage_Adminhtml_Blo
         return parent::_prepareCollection();
     }
 
+    /**
+     * Prepare columns
+     *
+     * @return $this Block with prepared columns
+     */
     protected function _prepareColumns()
     {
         $this->addColumn(
@@ -115,6 +131,34 @@ class Oggetto_Interview_Block_Adminhtml_Question_Grid extends Mage_Adminhtml_Blo
         return parent::_prepareColumns();
     }
 
+    /**
+     * Prepare mass actions
+     *
+     * @return $this|Mage_Adminhtml_Block_Widget_Grid Block with prepared mass actions
+     */
+    protected function _prepareMassAction()
+    {
+        $this->setMassactionIdField('id');
+        $this->getMassactionBlock()->setFormFieldName('id');
+        $this->getMassactionBlock()
+            ->addItem('delete', [
+                'label'     => $this->__('Delete'),
+                'url'       => $this->getUrl('*/*/massDelete', ['' => '']),
+                'confirm'   => $this->__('Are you sure?')
+            ]);
+        $this->getMassactionBlock()
+            ->addItem('changeStatus', [
+                'label'     => $this->__('Change Status'),
+                'url'       => $this->getUrl('*/*/massChangeStatus', ['' => '']),
+                'confirm'   => $this->__('Are you sure?')
+            ]);
+        return $this;
+    }
+
+    /**
+     * @param Oggetto_Interview_Model_Question $row Question row in the grid
+     * @return string Row url
+     */
     public function getRowUrl($row)
     {
         return $this->getUrl('*/*/edit', ['id' => $row->getId()]);

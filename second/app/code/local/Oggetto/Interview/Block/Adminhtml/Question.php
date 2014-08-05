@@ -32,6 +32,9 @@
  */
 class Oggetto_Interview_Block_Adminhtml_Question extends Mage_Adminhtml_Block_Widget_Grid_Container
 {
+    /**
+     * Class constructor
+     */
     public function __construct()
     {
         $this->_blockGroup = 'interview';

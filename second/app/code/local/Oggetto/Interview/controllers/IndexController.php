@@ -27,11 +27,14 @@
  *
  * @category   Oggetto
  * @package    Oggetto_Interview
- * @subpackage controllers
+ * @subpackage controller
  * @author     Eduard Paliy <epaliy@oggettoweb.com>
  */
 class Oggetto_Interview_IndexController extends Mage_Core_Controller_Front_Action
 {
+    /**
+     * Render form for question writing
+     */
     public function indexAction()
     {
         $request = $this->getRequest();

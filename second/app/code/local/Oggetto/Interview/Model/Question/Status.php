@@ -32,8 +32,11 @@
  */
 class Oggetto_Interview_Model_Question_Status
 {
-    const NOT_ANSWERED = 1;
-    const ANSWERED = 2;
+    /**
+     * Questions statuses
+     */
+    const NOT_ANSWERED = 0;
+    const ANSWERED = 1;
 
     /**
      * Get two statuses of question for DB

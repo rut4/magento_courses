@@ -32,5 +32,4 @@
  */
 class Oggetto_Interview_Block_Question extends Mage_Core_Block_Template
 {
-
 }

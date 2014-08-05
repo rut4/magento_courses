@@ -54,10 +54,10 @@ try {
             $installer->getTable('interview/question'),
             'status',
             [
-                'type'      => 'options',
-                'options'   => Mage::getModel('interview/question_status')->toOptionArray(),
+                'type'      => Varien_Db_Ddl_Table::TYPE_SMALLINT,
+                'length'    => 1,
                 'nullable'  => true,
-                'default'   => 1,
+                'default'   => 0,
                 'comment'   => 'Status'
             ]
         );

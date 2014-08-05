@@ -33,17 +33,26 @@
 
 class Oggetto_Interview_Block_Adminhtml_Question_Edit extends Mage_Adminhtml_Block_Widget_Form_Container
 {
+    /**
+     * Class constructor
+     */
     public function __construct()
     {
         $this->_blockGroup = 'interview';
-        $this->_question = 'adminhtml_question';
+        $this->_controller = 'adminhtml_question';
+        $this->_mode = 'edit';
 
         parent::__construct();
     }
 
+    /**
+     * Get edit form header text
+     *
+     * @return string Header
+     */
     public function getHeaderText()
     {
-        if (Mage::registry('interview')->getId()) {
+        if (Mage::registry('question')->getId()) {
             return $this->__('Edit');
         } else {
             return $this->__('New');
