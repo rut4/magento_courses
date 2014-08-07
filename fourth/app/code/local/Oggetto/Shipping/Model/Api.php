@@ -38,6 +38,9 @@ class Oggetto_Shipping_Model_Api
     private $_apiUrl;
     private $_httpClient;
 
+    /**
+     * Class constructor
+     */
     public function __construct()
     {
         $this->_apiUrl = 'http://new.oggy.co/shipping/api/rest.php';
@@ -79,7 +82,7 @@ class Oggetto_Shipping_Model_Api
         } catch (Exception $e) {
             Mage::logException($e);
         }
-        return null;
+        return [];
     }
 
     /**
@@ -98,8 +101,8 @@ class Oggetto_Shipping_Model_Api
             'to_region'     => $dest['region'],
             'to_city'       => $dest['city']
         ]);
-        if (is_null($response)) {
-            return null;
+        if (empty($response)) {
+            return [];
         }
         if ($response['status'] == self::RESPONSE_STATUS_SUCCESS) {
             return $response['prices'];
