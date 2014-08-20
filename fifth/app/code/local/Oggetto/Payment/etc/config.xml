@@ -40,6 +40,11 @@
                 <class>Oggetto_Payment_Helper</class>
             </oggettopayment>
         </helpers>
+        <blocks>
+            <oggettopayment>
+                <class>Oggetto_Payment_Block</class>
+            </oggettopayment>
+        </blocks>
     </global>
     <default>
         <payment>
@@ -47,11 +52,22 @@
                 <model>oggettopayment/method_standard</model>
                 <active>1</active>
                 <title>Oggetto Payment</title>
-                <gateway_url>http://new.oggy.co/payment/form.php</gateway_url>
+                <gateway_url>http://edu.oggettoweb.ru/homework/payment/form.php</gateway_url>
                 <sort_order>10</sort_order>
             </oggetto>
         </payment>
     </default>
+    <frontend>
+        <routers>
+            <oggetto>
+                <use>standard</use>
+                <args>
+                    <module>Oggetto_Payment</module>
+                    <frontName>oggetto</frontName>
+                </args>
+            </oggetto>
+        </routers>
+    </frontend>
     <phpunit>
         <suite>
             <modules>

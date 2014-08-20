@@ -2,21 +2,21 @@
 
 class Oggetto_Payment_PaymentController extends Mage_Core_Controller_Front_Action
 {
-    // The redirect action is triggered when someone places an order
     public function redirectAction()
     {
+        Mage::log('redirect action visited');
         $this->loadLayout();
         $block = $this->getLayout()
-            ->createBlock('Mage_Core_Block_Template', 'payment', ['template' => 'oggetto/payment/redirect.phtml']);
+            ->createBlock('Oggetto_Payment_Block_Standard', 'payment', ['template' => 'oggetto/payment/redirect.phtml']);
         $this->getLayout()
             ->getBlock('content')
             ->append($block);
         $this->renderLayout();
     }
 
-    // The response action is triggered when your gateway sends back a response after processing the customer's payment
     public function reportAction()
     {
+        Mage::log('report action visited');
         if ($this->getRequest()->isPost()) {
 
             /*

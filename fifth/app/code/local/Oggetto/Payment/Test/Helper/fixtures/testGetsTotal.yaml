@@ -1,0 +1,8 @@
+tables:
+  sales/order:
+    - grand_total: 2239.19
+      base_grand_total: 2239.19
+      increment_id: 10000042
+    - grand_total: 22.00
+      base_grand_total: 22.00
+      increment_id: 10000321

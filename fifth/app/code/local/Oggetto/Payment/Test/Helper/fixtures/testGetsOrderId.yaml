@@ -1,0 +1,5 @@
+tables:
+  sales/order:
+    - increment_id: 10000042
+    - increment_id: 10000321
+

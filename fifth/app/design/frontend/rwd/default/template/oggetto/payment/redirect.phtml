@@ -1,11 +1,8 @@
 <?php
-/** @var Mage_Core_Block_Template $this */
-
-/** @var Oggetto_Payment_Helper_Data $_helper */
-$_helper = $this->helper('oggettopayment');
+/** @var Oggetto_Payment_Block_Standard $this */
 ?>
-<form name="payment_form" method="post" action="<?php echo $_helper->getGatewayUrl(); ?>">
-    <?php foreach ($_helper->getFields() as $_field => $_value): ?>
+<form name="payment_form" method="post" action="<?php echo $this->getGatewayUrl(); ?>">
+    <?php foreach ($this->getFields() as $_field => $_value): ?>
         <input type="hidden" name="<?php echo $_field; ?>" value="<?php echo $_value; ?>">
     <?php endforeach; ?>
 </form>

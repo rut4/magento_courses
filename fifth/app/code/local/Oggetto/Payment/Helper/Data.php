@@ -4,72 +4,26 @@ class Oggetto_Payment_Helper_Data extends Mage_Core_Helper_Data
     /** @var Mage_Sales_Model_Order $_order */
     protected $_order;
 
-    protected $_fields = [
-        'order_id',
-        'total',
-        'items',
-        'success_url',
-        'error_url',
-        'payment_report_url',
-        'hash'
-    ];
-
-    public function __construct()
-    {
-        $this->_loadOrder();
-    }
-
+    /**
+     * Get order
+     *
+     * @return Mage_Sales_Model_Order
+     */
     protected function _getOrder()
     {
-        if (is_null($this->_order)) {
-            $this->_loadOrder();
-        }
-        return $this->_order;
-    }
-
-    protected function _fillFields()
-    {
-        return array_combine($this->_fields, $this->_getValues());
-    }
-
-    protected function _getValues()
-    {
-        return [
-            $this->getOrderId(),
-            $this->getTotal(),
-            $this->getItemsNames(),
-            $this->getSuccessUrl(),
-            $this->getErrorUrl(),
-            $this->getPaymentReportUrl(),
-            $this->getSignature()
-        ];
-    }
-
-    protected function _loadOrder()
-    {
-        $this->_order = Mage::getModel('sales/order');
         $orderId = Mage::getSingleton('checkout/session')->getLastRealOrderId();
-        $this->_order->loadByIncrementId($orderId);
-    }
-
-    public function getGatewayUrl()
-    {
-        return Mage::getStoreConfig('payment/oggetto/gateway_url');
-    }
-
-    public function getFields()
-    {
-        return $this->_fillFields();
+        $order = Mage::getModel('sales/order')->loadByIncrementId($orderId);
+        return $order;
     }
 
     public function getOrderId()
     {
-        return $this->_getOrder()->getId();
+        return $this->_getOrder()->getIncrementId();
     }
 
     public function getTotal()
     {
-        return $this->_getOrder()->getGrandTotal();
+        return str_replace('.', ',', $this->_getOrder()->getGrandTotal());
     }
 
     public function getItemsNames()
@@ -81,7 +35,7 @@ class Oggetto_Payment_Helper_Data extends Mage_Core_Helper_Data
             return $item->getName();
         }, $items);
 
-       return implode(',', $itemsNames);
+        return implode(',', $itemsNames);
     }
 
     public function getSuccessUrl()
@@ -96,24 +50,16 @@ class Oggetto_Payment_Helper_Data extends Mage_Core_Helper_Data
 
     public function getPaymentReportUrl()
     {
-        return $this->_getUrl('payment/payment/report');
+        return $this->_getUrl('oggetto/payment/report');
     }
 
-    public function getSignature()
+    public function getGatewayUrl()
     {
-        $filledFields = $this->_fillFields();
-        ksort($filledFields);
-        $sign = '';
-        array_map(function ($field, $value) use (&$sign) {
-            $sign .= "{$field}:{$value}|";
-        }, array_keys($filledFields), array_values($filledFields));
-        $sign .= $this->_getSecretKey();
-        return md5($sign);
+        return Mage::getStoreConfig('payment/oggetto/gateway_url');
     }
 
-    protected function _getSecretKey()
+    public function getSecretKey()
     {
         return 'ZnVjayB0aGUgZHVjaw==';
     }
-
 }

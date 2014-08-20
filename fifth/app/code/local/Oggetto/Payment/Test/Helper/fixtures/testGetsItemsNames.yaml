@@ -1,0 +1,19 @@
+tables:
+  sales/order:
+    - entity_id: 42
+      increment_id: 10000042
+    - entity_id: 321
+      increment_id: 10000321
+  sales/order_item:
+    - name: 'Foo'
+      order_id: 42
+      qty_ordered: 1
+    - name: 'Bar'
+      order_id: 42
+      qty_ordered: 3
+    - name: 'Baz'
+      order_id: 42
+      qty_ordered: 5
+    - name: 'Qux'
+      order_id: 321
+      qty_ordered: 10

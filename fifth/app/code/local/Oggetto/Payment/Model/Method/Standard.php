@@ -14,7 +14,7 @@ class Oggetto_Payment_Model_Method_Standard extends Mage_Payment_Model_Method_Ab
 
     public function getOrderPlaceRedirectUrl()
     {
-        return Mage::getUrl('payment/payment/redirect', ['_secure' => true]);
+        return Mage::getUrl('oggetto/payment/redirect', ['_secure' => true]);
     }
 
 }
