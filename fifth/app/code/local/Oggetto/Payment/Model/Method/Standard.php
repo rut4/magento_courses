@@ -8,6 +8,7 @@ class Oggetto_Payment_Model_Method_Standard extends Mage_Payment_Model_Method_Ab
      */
     protected $_code = 'oggetto';
 
+    protected $_canCapture              = true;
     protected $_isInitializeNeeded      = true;
     protected $_canUseInternal          = true;
     protected $_canUseForMultishipping  = false;

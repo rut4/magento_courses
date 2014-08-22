@@ -67,6 +67,13 @@
                 </args>
             </oggetto>
         </routers>
+        <layout>
+            <updates>
+                <payment>
+                    <file>payment.xml</file>
+                </payment>
+            </updates>
+        </layout>
     </frontend>
     <phpunit>
         <suite>
