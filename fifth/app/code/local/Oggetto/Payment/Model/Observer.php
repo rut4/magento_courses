@@ -23,20 +23,41 @@
  */
 
 /**
- * Report validator interface
+ * Observer class
  *
  * @category   Oggetto
  * @package    Oggetto_Payment
  * @subpackage Model
  * @author     Eduard Paliy <epaliy@oggettoweb.com>
  */
-interface Oggetto_Payment_Model_Validator_IValidator
+class Oggetto_Payment_Model_Observer
 {
     /**
-     * Validate report
+     * After order save event
      *
-     * @param Oggetto_Payment_Model_Report $report
-     * @return bool
+     * @param Varien_Event_Observer $observer
+     * @return void
      */
-    public function validate(Oggetto_Payment_Model_Report $report);
+    public function afterOrderSave(Varien_Event_Observer $observer)
+    {
+        /** @var Mage_Sales_Model_Order $order */
+        $order = $observer->getEvent()->getOrder();
+
+        if ($order->getState() == Mage_Sales_Model_Order::STATE_NEW
+            && $order->getPayment()->getMethod() == Mage::getModel('oggettopayment/method_standard')->getCode()) {
+
+            /** @var Mage_Sales_Model_Order_Invoice $invoice */
+            $invoice = Mage::getModel('sales/service_order', $order)->prepareInvoice();
+            $invoice->register();
+
+            /** @var Mage_Core_Model_Resource_Transaction $transaction */
+            $transaction = Mage::getModel('core/resource_transaction');
+
+
+            $transaction->addObject($invoice)
+                ->addObject($order);
+
+            $transaction->save();
+        }
+    }
 }

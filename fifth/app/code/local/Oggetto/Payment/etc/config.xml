@@ -45,6 +45,17 @@
                 <class>Oggetto_Payment_Block</class>
             </oggettopayment>
         </blocks>
+        <events>
+            <sales_order_save_commit_after>
+                <observers>
+                    <invoice>
+                        <type>singleton</type>
+                        <class>oggettopayment/observer</class>
+                        <method>afterOrderSave</method>
+                    </invoice>
+                </observers>
+            </sales_order_save_commit_after>
+        </events>
     </global>
     <default>
         <payment>
@@ -54,6 +65,7 @@
                 <title>Oggetto Payment</title>
                 <gateway_url>http://edu.oggettoweb.ru/homework/payment/form.php</gateway_url>
                 <sort_order>10</sort_order>
+                <secret_key>ZnVjayB0aGUgZHVjaw==</secret_key>
             </oggetto>
         </payment>
     </default>

@@ -68,6 +68,14 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </sort_order>
+                        <secret_key>
+                            <label>Secret Key</label>
+                            <frontend_type>obscure</frontend_type>
+                            <sort_order>5</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </secret_key>
                     </fields>
                 </oggetto>
             </groups>
