@@ -35,7 +35,7 @@ class Oggetto_Payment_Model_Validator_Hash implements Oggetto_Payment_Model_Vali
     /**
      * Validate hash report
      *
-     * @param Oggetto_Payment_Model_Report $report
+     * @param Oggetto_Payment_Model_Report $report Report
      * @return bool
      */
     public function validate(Oggetto_Payment_Model_Report $report)

@@ -101,7 +101,6 @@ class Oggetto_Payment_Model_Report extends Mage_Core_Model_Abstract
                 $invoice->capture();
             }
             $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, true, 'Gateway has authorized the payment.');
-
             $order->sendNewOrderEmail();
             $order->setEmailSent(true);
         } else if ($this->getStatus() == self::RESPONSE_PAYMENT_STATUS_ERROR) {
@@ -111,6 +110,7 @@ class Oggetto_Payment_Model_Report extends Mage_Core_Model_Abstract
 
             $order->cancel()->setState(Mage_Sales_Model_Order::STATE_CANCELED, true, 'Gateway canceled the payment.');
         }
+        $invoice->save();
         $order->save();
     }
 }

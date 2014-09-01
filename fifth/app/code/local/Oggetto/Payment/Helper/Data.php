@@ -61,7 +61,7 @@ class Oggetto_Payment_Helper_Data extends Mage_Core_Helper_Data
      *
      * @return string
      */
-    public function getOrderId()
+    protected function _getOrderId()
     {
         return $this->_getOrder()->getIncrementId();
     }
@@ -71,9 +71,9 @@ class Oggetto_Payment_Helper_Data extends Mage_Core_Helper_Data
      *
      * @return string
      */
-    public function getTotal()
+    protected function _getTotal()
     {
-        return $this->_getOrder()->getGrandTotal();
+        return $this->formatPriceWithComma($this->_getOrder()->getGrandTotal());
     }
 
     /**
@@ -81,7 +81,7 @@ class Oggetto_Payment_Helper_Data extends Mage_Core_Helper_Data
      *
      * @return string
      */
-    public function getItemsNames()
+    protected function _getItemsNames()
     {
         $items = $this->_getOrder()->getAllItems();
 
@@ -98,7 +98,7 @@ class Oggetto_Payment_Helper_Data extends Mage_Core_Helper_Data
      *
      * @return string
      */
-    public function getSuccessUrl()
+    protected function _getSuccessUrl()
     {
         return $this->_getUrl('checkout/onepage/success');
     }
@@ -108,7 +108,7 @@ class Oggetto_Payment_Helper_Data extends Mage_Core_Helper_Data
      *
      * @return string
      */
-    public function getErrorUrl()
+    protected function _getErrorUrl()
     {
         return $this->_getUrl('checkout/onepage/error');
     }
@@ -118,7 +118,7 @@ class Oggetto_Payment_Helper_Data extends Mage_Core_Helper_Data
      *
      * @return string
      */
-    public function getPaymentReportUrl()
+    protected function _getPaymentReportUrl()
     {
         return $this->_getUrl('oggetto/payment/report');
     }
@@ -138,7 +138,7 @@ class Oggetto_Payment_Helper_Data extends Mage_Core_Helper_Data
      *
      * @return string
      */
-    public function getSecretKey()
+    protected function _getSecretKey()
     {
         return Mage::getStoreConfig('payment/oggetto/secret_key');
     }
@@ -156,7 +156,7 @@ class Oggetto_Payment_Helper_Data extends Mage_Core_Helper_Data
         array_map(function ($field, $value) use (&$sign) {
             $sign .= "{$field}:{$value}|";
         }, array_keys($filledFields), array_values($filledFields));
-        $sign .= $this->getSecretKey();
+        $sign .= $this->_getSecretKey();
         return md5($sign);
     }
 
@@ -168,12 +168,12 @@ class Oggetto_Payment_Helper_Data extends Mage_Core_Helper_Data
     protected function _getValues()
     {
         return [
-            $this->getOrderId(),
-            $this->getTotal(),
-            $this->getItemsNames(),
-            $this->getSuccessUrl(),
-            $this->getErrorUrl(),
-            $this->getPaymentReportUrl()
+            $this->_getOrderId(),
+            $this->_getTotal(),
+            $this->_getItemsNames(),
+            $this->_getSuccessUrl(),
+            $this->_getErrorUrl(),
+            $this->_getPaymentReportUrl()
         ];
     }
 

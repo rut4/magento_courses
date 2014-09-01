@@ -41,23 +41,23 @@ class Oggetto_Payment_Model_Observer
     public function afterOrderSave(Varien_Event_Observer $observer)
     {
         /** @var Mage_Sales_Model_Order $order */
-        $order = $observer->getEvent()->getOrder();
+        $order = $observer->getOrder();
 
         if ($order->getState() == Mage_Sales_Model_Order::STATE_NEW
             && $order->getPayment()->getMethod() == Mage::getModel('oggettopayment/method_standard')->getCode()) {
 
+            $order->setState(Mage_Sales_Model_Order::STATE_PENDING_PAYMENT, true);
+
             /** @var Mage_Sales_Model_Order_Invoice $invoice */
-            $invoice = Mage::getModel('sales/service_order', $order)->prepareInvoice();
+            $invoice = $order->prepareInvoice();
             $invoice->register();
 
             /** @var Mage_Core_Model_Resource_Transaction $transaction */
             $transaction = Mage::getModel('core/resource_transaction');
 
-
             $transaction->addObject($invoice)
-                ->addObject($order);
-
-            $transaction->save();
+                ->addObject($order)
+                ->save();
         }
     }
 }
