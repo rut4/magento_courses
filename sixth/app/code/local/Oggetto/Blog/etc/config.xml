@@ -30,6 +30,23 @@
         </Oggetto_Blog>
     </modules>
     <global>
+        <models>
+            <blog>
+                <class>Oggetto_Blog_Model</class>
+                <resourceModel>blog_resource</resourceModel>
+            </blog>
+            <blog_resource>
+                <class>Oggetto_Blog_Model_Resource</class>
+                <entities>
+                    <category>
+                        <table>oggetto_blog_category</table>
+                    </category>
+                    <post>
+                        <table>oggetto_blog_post</table>
+                    </post>
+                </entities>
+            </blog_resource>
+        </models>
         <blocks>
             <blog>
                 <class>Oggetto_Blog_Block</class>
@@ -40,6 +57,13 @@
                 <class>Oggetto_Blog_Helper</class>
             </blog>
         </helpers>
+        <resources>
+            <blog_setup>
+                <setup>
+                    <module>Oggetto_Blog</module>
+                </setup>
+            </blog_setup>
+        </resources>
     </global>
     <admin>
         <routers>
@@ -70,6 +94,9 @@
                                 <tree translate="title">
                                     <title>Post Tree</title>
                                 </tree>
+                                <post translate="title">
+                                    <title>Post Grid</title>
+                                </post>
                             </children>
                         </blog>
                     </children>
@@ -77,4 +104,11 @@
             </resources>
         </acl>
     </adminhtml>
+    <phpunit>
+        <suite>
+            <modules>
+                <Oggetto_Blog />
+            </modules>
+        </suite>
+    </phpunit>
 </config>

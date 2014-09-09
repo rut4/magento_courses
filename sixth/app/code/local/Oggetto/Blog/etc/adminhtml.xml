@@ -34,6 +34,11 @@
                     <sort_order>1</sort_order>
                     <action>adminhtml/blog/tree</action>
                 </tree>
+                <post translate="title">
+                    <title>Post Grid</title>
+                    <sort_order>1</sort_order>
+                    <action>adminhtml/post/index</action>
+                </post>
             </children>
         </blog>
     </menu>

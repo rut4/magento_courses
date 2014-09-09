@@ -41,19 +41,19 @@
 Ext.onReady(function(){
     var Tree = Ext.tree;
     var tree = new Tree.TreePanel('tree', {
-        animate:true,
+        animate: true,
         loader: new Tree.TreeLoader({
-            dataUrl:'<?php echo $this->getTreeLoaderUrl() ?>'
+            dataUrl: '<?php echo $this->getTreeLoaderUrl() ?>'
         }),
-        enableDD:false,
+        enableDD: false,
         containerScroll: true
     });
 
     // set the root node
     var root = new Tree.AsyncTreeNode({
-        text: '<?php echo $this->getRootNodeName() ?>',
-        draggable:false,
-        id:'root'
+        text: '<?php echo $this->getRootNodeName(); ?>',
+        draggable: false,
+        id: 'root'
     });
     tree.setRootNode(root);
 
@@ -61,18 +61,18 @@ Ext.onReady(function(){
     tree.render();
     root.expand();
 
-    Event.observe($('tree_action_collapse'), 'click', function(){
+    Event.observe($('tree_action_collapse'), 'click', function () {
         tree.collapseAll();
     });
 
-    Event.observe($('tree_action_expand'), 'click', function(){
+    Event.observe($('tree_action_expand'), 'click', function () {
         tree.expandAll();
     });
 
     MediabrowserInstance.setTree(tree);
     tree.addListener('click', MediabrowserInstance.selectFolder.bind(MediabrowserInstance));
-    tree.expandPath('<?php echo $this->getTreeCurrentPath() ?>','', function(success, node) {
-        MediabrowserInstance.selectFolder(node);
-    });
+<!--    tree.expandPath('--><?php //echo $this->getTreeCurrentPath() ?><!--','', function(success, node) {-->
+<!--        MediabrowserInstance.selectFolder(node);-->
+<!--    });-->
 });
 </script>

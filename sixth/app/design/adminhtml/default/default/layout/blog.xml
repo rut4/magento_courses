@@ -25,8 +25,45 @@
 -->
 <layout>
     <adminhtml_blog_tree>
+        <reference name="head">
+            <action method="addItem">
+                <type>js</type>
+                <name>extjs/fix-defer-before.js</name>
+            </action>
+            <action method="addItem">
+                <type>js</type>
+                <name>extjs/ext-tree.js</name>
+            </action>
+            <action method="addItem">
+                <type>js</type>
+                <name>extjs/fix-defer.js</name>
+            </action>
+            <action method="addItem">
+                <type>js</type>
+                <name>extjs/ext-tree-checkbox.js</name>
+            </action>
+            <action method="addItem">
+                <type>js_css</type>
+                <name>extjs/resources/css/ext-all.css</name>
+            </action>
+            <action method="addItem">
+                <type>js_css</type>
+                <name>extjs/resources/css/ytheme-magento.css</name>
+            </action>
+            <action method="addJs">
+                <script>mage/adminhtml/browser.js</script>
+            </action>
+        </reference>
         <reference name="content">
+            <block name="wysiwyg_images.js" type="adminhtml/cms_wysiwyg_images_content" template="cms/browser/js.phtml" />
             <block type="blog/adminhtml_tree" name="blog.adminhtml.tree" template="blog/tree.phtml" />
         </reference>
     </adminhtml_blog_tree>
+
+    <adminhtml_post_index>
+        <reference name="content">
+            <block type="blog/adminhtml_post" name="blog.adminhtml.post" />
+        </reference>
+    </adminhtml_post_index>
+
 </layout>
