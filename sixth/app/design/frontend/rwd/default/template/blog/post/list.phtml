@@ -23,33 +23,23 @@
  */
 
 /**
- * Post resource
- *
- * @category   Oggetto
- * @package    Oggetto_Blog
- * @subpackage Model
- * @author     Eduard Paliy <epaliy@oggettoweb.com>
+ * @var Oggetto_Blog_Block_Post_List $this
+ * @var Oggetto_Blog_Model_Post $post
  */
-class Oggetto_Blog_Model_Resource_Post extends Mage_Core_Model_Resource_Db_Abstract
-{
-    /**
-     * Resource initialization with main table and id field name
-     *
-     * @return void
-     */
-    protected function _construct()
-    {
-        $this->_init('blog/post', 'post_id');
-    }
-
-    /**
-     * Add placing date to data
-     *
-     * @param Oggetto_Blog_Model_Post $object Post model
-     * @return Mage_Core_Model_Abstract
-     */
-    protected function _beforeSave($object)
-    {
-        $object->setPlacingDate(now());
-    }
-}
+?>
+<div class="container">
+<?php foreach ($this->getPostCollection() as $post): ?>
+    <div class="post">
+        <h2 class="post__title">
+            <span class="post__category"><small><?php echo $this->getCategoryPath($post); ?></small></span>
+            <?php echo $post->getTitle(); ?>
+        </h2>
+        <div class="post__text">
+            <?php echo $post->getText(); ?>
+        </div>
+        <div class="post__date">
+            <small><?php echo $post->getPlacingDate(); ?></small>
+        </div>
+    </div>
+<?php endforeach; ?>
+</div>

@@ -52,7 +52,7 @@ class Oggetto_Blog_Block_Adminhtml_Post_Grid extends Mage_Adminhtml_Block_Widget
      */
     protected function _getCollectionClass()
     {
-        return 'interview/question_collection';
+        return 'blog/post_collection';
     }
 
     /**

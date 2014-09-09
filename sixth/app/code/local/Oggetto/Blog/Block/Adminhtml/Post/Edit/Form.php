@@ -83,7 +83,7 @@ class Oggetto_Blog_Block_Adminhtml_Post_Edit_Form extends Mage_Adminhtml_Block_W
             'required'  => true
         ]);
 
-        $fieldset->addField('text', 'text', [
+        $fieldset->addField('text', 'textarea', [
             'name'      => 'text',
             'label'     => $this->__('Text'),
             'title'     => $this->__('Text'),

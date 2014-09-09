@@ -104,6 +104,24 @@
             </resources>
         </acl>
     </adminhtml>
+    <frontend>
+        <layout>
+            <updates>
+                <blog>
+                    <file>blog.xml</file>
+                </blog>
+            </updates>
+        </layout>
+        <routers>
+            <blog>
+                <use>standard</use>
+                <args>
+                    <module>Oggetto_Blog</module>
+                    <frontName>blog</frontName>
+                </args>
+            </blog>
+        </routers>
+    </frontend>
     <phpunit>
         <suite>
             <modules>

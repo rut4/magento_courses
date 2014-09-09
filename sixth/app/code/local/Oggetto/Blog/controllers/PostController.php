@@ -23,42 +23,24 @@
  */
 
 /**
- * Test category resource test
+ * Post controller
  *
  * @category   Oggetto
  * @package    Oggetto_Blog
- * @subpackage Test
+ * @subpackage Contoller
  * @author     Eduard Paliy <epaliy@oggettoweb.com>
  */
-class Oggetto_Blog_Test_Model_Resource_Category extends EcomDev_PHPUnit_Test_Case
+class Oggetto_Blog_PostController extends Mage_Core_Controller_Front_Action
 {
     /**
-     * Test category resource available via alias
+     * Display post list
      *
      * @return void
      */
-    public function testIsAvailableViaAlias()
+    public function listAction()
     {
-        $this->assertInstanceOf('Oggetto_Blog_Model_Resource_Category', Mage::getResourceModel('blog/category'));
+        $this->loadLayout()
+            ->renderLayout();
     }
 
-    /**
-     * Test category resource initializations with main table
-     *
-     * @return void
-     */
-    public function testInitializationsWithMainTable()
-    {
-        $this->assertEquals('oggetto_blog_category', Mage::getResourceModel('blog/category')->getMainTable());
-    }
-
-    /**
-     * Test category resource initializations with id field name
-     *
-     * @return void
-     */
-    public function testInitializationsWithIdFieldName()
-    {
-        $this->assertEquals('category_id', Mage::getResourceModel('blog/category')->getIdFieldName());
-    }
 }
