@@ -23,33 +23,22 @@
  */
 
 /**
- * Blog post
+ * Post resource collection
  *
  * @category   Oggetto
  * @package    Oggetto_Blog
  * @subpackage Model
  * @author     Eduard Paliy <epaliy@oggettoweb.com>
  */
-class Oggetto_Blog_Model_Post extends Mage_Core_Model_Abstract
+class Oggetto_Blog_Model_Resource_Category_Collection extends Mage_Core_Model_Resource_Db_Collection_Abstract
 {
     /**
-     * Initialization with resource model
+     * Initialization category collection
      *
      * @return void
      */
     protected function _construct()
     {
-        $this->_init('blog/post');
-    }
-
-    /**
-     * Get category path
-     *
-     * @return string
-     */
-    public function getCategoryPath()
-    {
-        $category = Mage::getModel('blog/category')->load($this->getCategoryId());
-        return $category->getPath();
+        $this->_init('blog/category');
     }
 }

@@ -28,10 +28,17 @@
 /** @var Oggetto_Blog_Block_Adminhtml_Tree $this */
 ?>
 <div class="categories-side-col">
+    <div class="content-header">
+        <h3 class="icon-head head-categories"><?php echo $this->__('Categories') ?></h3>
+        <?php if ($this->getRoot()): ?>
+            <?php echo $this->getAddRootButtonHtml() ?><br />
+            <?php echo $this->getAddSubButtonHtml() ?>
+        <?php endif; ?>
+    </div>
     <div class="tree-actions">
-        <a href="#" id="tree_action_collapse"><?php echo $this->helper('blog')->__('Collapse All'); ?></a>
+        <a href="#" id="tree_action_collapse"><?php echo $this->__('Collapse All'); ?></a>
         <span class="separator">|</span>
-        <a href="#" id="tree_action_expand"><?php echo $this->helper('blog')->__('Expand All'); ?></a>
+        <a href="#" id="tree_action_expand"><?php echo $this->__('Expand All'); ?></a>
     </div>
 </div>
 
@@ -75,4 +82,17 @@ Ext.onReady(function(){
 <!--        MediabrowserInstance.selectFolder(node);-->
 <!--    });-->
 });
+
+function addNew(url)
+{
+    if (/store\/\d+/.test(url)) {
+        url = url.replace(/store\/\d+/, "store/" + tree.storeId);
+    }
+    else    {
+        url+= "store/" + tree.storeId + "/";
+    }
+
+    url+= 'parent/'+tree.currentNodeId;
+    updateContent(url);
+}
 </script>

@@ -51,19 +51,4 @@ class Oggetto_Blog_Test_Model_Post extends EcomDev_PHPUnit_Test_Case
     {
         $this->assertInstanceOf('Oggetto_Blog_Model_Resource_Post', Mage::getModel('blog/post')->getResource());
     }
-
-    /**
-     * Test post model adds placing date while saving
-     *
-     * @return void
-     */
-    public function testAddsPlacingDateWhileSaving()
-    {
-        $post = $this->getModelMock('blog/post', ['addPlacingDate']);
-
-        $post->expects($this->once())
-            ->method('addPlacingDate')
-            ->with($this->equalTo(now()))
-            ->will($this->returnSelf());
-    }
 }

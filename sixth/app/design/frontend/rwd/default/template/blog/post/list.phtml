@@ -29,7 +29,7 @@
 ?>
 <div class="container">
 <?php foreach ($this->getPostCollection() as $post): ?>
-    <div class="post">
+    <article class="post">
         <h2 class="post__title">
             <span class="post__category"><small><?php echo $this->getCategoryPath($post); ?></small></span>
             <?php echo $post->getTitle(); ?>
@@ -40,6 +40,9 @@
         <div class="post__date">
             <small><?php echo $post->getPlacingDate(); ?></small>
         </div>
-    </div>
+    </article>
 <?php endforeach; ?>
+    <div class="pagination">
+        <?php echo $this->getChildHtml('pager'); ?>
+    </div>
 </div>

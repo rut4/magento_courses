@@ -73,4 +73,41 @@ class Oggetto_Blog_Block_Adminhtml_Tree extends Mage_Adminhtml_Block_Template
         }
         return $treePath;
     }
+
+    /**
+     * Get root
+     *
+     * @return Oggetto_Blog_Model_Category_Tree
+     */
+    public function getRoot()
+    {
+        return Mage::getModel('blog/category_tree')->getRoot();
+    }
+
+    /**
+     * Prepare layout
+     *
+     * @return Mage_Adminhtml_Block_Template
+     */
+    protected function _prepareLayout()
+    {
+        $addUrl = $this->getUrl("*/*/add", [
+            '_current'  => true,
+            'id'        => null,
+            '_query'    => false
+        ]);
+
+        $this->setChild('add_sub_button',
+            $this->getLayout()->createBlock('adminhtml/widget_button')
+                ->setData(array(
+                    'label'     => Mage::helper('catalog')->__('Add Subcategory'),
+                    'onclick'   => "addNew('".$addUrl."', false)",
+                    'class'     => 'add',
+                    'id'        => 'add_subcategory_button',
+                    'style'     => $this->canAddSubCategory() ? '' : 'display: none;'
+                ))
+        );
+
+        return parent::_prepareLayout();
+    }
 }

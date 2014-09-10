@@ -32,6 +32,28 @@
  */
 class Oggetto_Blog_Block_Post_List extends Mage_Core_Block_Template
 {
+    protected $_postCollection;
+
+    /**
+     * Prepare layout with pagination
+     *
+     * @return Mage_Core_Block_Template
+     */
+    protected function _prepareLayout()
+    {
+        $this->_postCollection = Mage::getModel('blog/post')->getCollection();
+
+        parent::_prepareLayout();
+
+        $pager = $this->getLayout()->createBlock('page/html_pager', 'custom.pager');
+        $pager->setAvailableLimit([10 => 10]);
+        $pager->setCollection($this->_postCollection);
+
+        $this->setChild('pager', $pager);
+
+        return $this;
+    }
+
     /**
      * Get post collection
      *
@@ -39,7 +61,7 @@ class Oggetto_Blog_Block_Post_List extends Mage_Core_Block_Template
      */
     public function getPostCollection()
     {
-        return Mage::getModel('blog/post')->getCollection();
+        return $this->_postCollection;
     }
 
     /**

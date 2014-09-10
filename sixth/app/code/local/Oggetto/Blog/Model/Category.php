@@ -41,4 +41,36 @@ class Oggetto_Blog_Model_Category extends Mage_Core_Model_Abstract
     {
         $this->_init('blog/category');
     }
+
+    /**
+     * Get path from root to this category
+     *
+     * @return string
+     */
+    public function getPath()
+    {
+        $path = '';
+        do {
+            $path = "{$this->getName()}/{$path}";
+            $this->load($this->getParentId());
+        } while ($this->getId() != $this->getParentCategoryId());
+
+        return $path;
+    }
+
+    /**
+     * Get root category
+     *
+     * @return null|Oggetto_Blog_Model_Category
+     */
+    public function getRoot()
+    {
+        if (is_null($this->getParentCategoryId())) {
+            return null;
+        }
+        while ($this->getId() != $this->getParentCategoryId()) {
+            $this->load($this->getParentId());
+        }
+        return $this;
+    }
 }
