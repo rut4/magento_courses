@@ -1,0 +1,159 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Oggetto Web extension for Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade
+ * the Oggetto News module to newer versions in the future.
+ * If you wish to customize the Oggetto News module for your needs
+ * please refer to http://www.magentocommerce.com for more information.
+ *
+ * @category   Oggetto
+ * @package    Oggetto_News
+ * @copyright  Copyright (C) 2014 Oggetto Web ltd (http://oggettoweb.com/)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+-->
+<config>
+    <modules>
+        <Oggetto_News>
+            <version>1.0.0</version>
+        </Oggetto_News>
+    </modules>
+    <global>
+        <resources>
+            <news_setup>
+                <setup>
+                    <module>Oggetto_News</module>
+                </setup>
+            </news_setup>
+        </resources>
+        <blocks>
+            <news>
+                <class>Oggetto_News_Block</class>
+            </news>
+        </blocks>
+        <helpers>
+            <news>
+                <class>Oggetto_News_Helper</class>
+            </news>
+        </helpers>
+        <models>
+            <news>
+                <class>Oggetto_News_Model</class>
+                <resourceModel>news_resource</resourceModel>
+            </news>
+            <news_resource>
+                <class>Oggetto_News_Model_Resource</class>
+                <entities>
+                    <category>
+                        <table>oggetto_news_category</table>
+                    </category>
+                    <post>
+                        <table>oggetto_news_post</table>
+                    </post>
+                    <category_post>
+                        <table>oggetto_news_category_post</table>
+                    </category_post>
+                    <post_category>
+                        <table>oggetto_news_category_post</table>
+                    </post_category>
+                </entities>
+            </news_resource>
+        </models>
+        <!--events for url routing for example /other -> other categories -->
+        <events>
+            <controller_front_init_routers>
+                <observers>
+                    <news>
+                        <class>Oggetto_News_Controller_Router</class>
+                        <method>initControllerRouters</method>
+                    </news>
+                </observers>
+            </controller_front_init_routers>
+        </events>
+    </global>
+    <adminhtml>
+        <layout>
+            <updates>
+                <news>
+                    <file>news.xml</file>
+                </news>
+            </updates>
+        </layout>
+        <translate>
+            <modules>
+                <Oggetto_News>
+                    <files>
+                        <default>Oggetto_News.csv</default>
+                    </files>
+                </Oggetto_News>
+            </modules>
+        </translate>
+        <global_search>
+            <post>
+                <class>news/adminhtml_search_post</class>
+                <acl>news</acl>
+            </post>
+        </global_search>
+    </adminhtml>
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <Oggetto_News before="Mage_Adminhtml">Oggetto_News_Adminhtml</Oggetto_News>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
+    <frontend>
+        <routers>
+            <news>
+                <use>standard</use>
+                <args>
+                    <module>Oggetto_News</module>
+                    <frontName>news</frontName>
+                </args>
+            </news>
+        </routers>
+        <layout>
+            <updates>
+                <news>
+                    <file>news.xml</file>
+                </news>
+            </updates>
+        </layout>
+        <translate>
+            <modules>
+                <Oggetto_News>
+                    <files>
+                        <default>Oggetto_News.csv</default>
+                    </files>
+                </Oggetto_News>
+            </modules>
+        </translate>
+    </frontend>
+    <default>
+        <news>
+            <category>
+                <breadcrumbs>1</breadcrumbs>
+                <tree>1</tree>
+                <recursion>0</recursion>
+            </category>
+            <post>
+                <breadcrumbs>1</breadcrumbs>
+            </post>
+        </news>
+    </default>
+</config>

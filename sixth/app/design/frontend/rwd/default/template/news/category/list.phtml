@@ -1,0 +1,63 @@
+<?php
+/**
+ * Oggetto Web extension for Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade
+ * the Oggetto News module to newer versions in the future.
+ * If you wish to customize the Oggetto News module for your needs
+ * please refer to http://www.magentocommerce.com for more information.
+ *
+ * @category   Oggetto
+ * @package    Oggetto_News
+ * @copyright  Copyright (C) 2014 Oggetto Web ltd (http://oggettoweb.com/)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
+/**
+ * Category list template
+ *
+ * @category    Oggetto
+ * @package     Oggetto_News
+ * @author      Ultimate Module Creator
+ */
+?>
+<?php echo $this->getMessagesBlock()->getGroupedHtml() ?>
+<?php $_categories = $this->getCategories(); ?>
+<div class="page-title category-title">
+    <h1><?php echo Mage::helper('news')->__('Categories') ?></h1>
+</div>
+<?php if ($_categories->getSize() > 0) :?>
+    <?php if ($this->_getDisplayMode() == 0) : ?>
+        <?php echo $this->getPagerHtml(); ?>
+        <div class="category-list-container">
+            <?php foreach ($_categories as $_category) : ?>
+                <div class="category-list-item">
+            <a href="<?php echo $_category->getCategoryUrl()?>">
+                <?php echo $_category->getName();?>
+            </a><br />
+                </div>
+            <?php endforeach;?>
+        </div>
+        <?php echo $this->getPagerHtml(); ?>
+    <?php else : ?>
+        <ul id="categories-list">
+            <?php foreach ($_categories as $_category) : ?>
+                <?php echo $this->drawCategory($_category);?>
+            <?php endforeach;?>
+        </ul>
+        <script type="text/javascript">
+            newsTree('categories-list');
+        </script>
+    <?php endif;?>
+<?php else : ?>
+    <?php echo Mage::helper('news')->__('There are no categories at this moment');?>
+<?php endif;?>
