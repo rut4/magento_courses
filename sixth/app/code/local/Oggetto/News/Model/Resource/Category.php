@@ -30,8 +30,7 @@
  * @subpackage Model
  * @author     Eduard Paliy <epaliy@oggettoweb.com>
  */
-class Oggetto_News_Model_Resource_Category
-    extends Mage_Core_Model_Resource_Db_Abstract
+class Oggetto_News_Model_Resource_Category extends Mage_Core_Model_Resource_Db_Abstract
 {
     /**
      * Category tree object
@@ -40,9 +39,9 @@ class Oggetto_News_Model_Resource_Category
     protected $_tree;
 
     /**
-     * constructor
+     * Initialization with main table and id field name
      *
-     * @author Ultimate Module Creator
+     * @return void
      */
     public function _construct()
     {
@@ -53,7 +52,6 @@ class Oggetto_News_Model_Resource_Category
      * Retrieve category tree object
      *
      * @return Varien_Data_Tree_Db
-     * @author Ultimate Module Creator
      */
     protected function _getTree()
     {
@@ -68,16 +66,13 @@ class Oggetto_News_Model_Resource_Category
      * update children count for parent category
      * delete child categories
      *
-     * @param Varien_Object $object
+     * @param Mage_Core_Model_Abstract $object Category
      * @return Oggetto_News_Model_Resource_Category
-     * @author Ultimate Module Creator
      */
     protected function _beforeDelete(Mage_Core_Model_Abstract $object)
     {
         parent::_beforeDelete($object);
-        /**
-         * Update children count for all parent categories
-         */
+
         $parentIds = $object->getParentIds();
         if ($parentIds) {
             $childDecrease = $object->getChildrenCount() + 1; // +1 is itself
@@ -92,9 +87,8 @@ class Oggetto_News_Model_Resource_Category
     /**
      * Delete children categories of specific category
      *
-     * @param Varien_Object $object
+     * @param Varien_Object $object Category
      * @return Oggetto_News_Model_Resource_Category
-     * @author Ultimate Module Creator
      */
     public function deleteChildren(Varien_Object $object)
     {
@@ -121,9 +115,8 @@ class Oggetto_News_Model_Resource_Category
     /**
      * Process category data after save category object
      *
-     * @param Varien_Object $object
+     * @param Mage_Core_Model_Abstract $object Category
      * @return Oggetto_News_Model_Resource_Category
-     * @author Ultimate Module Creator
      */
     protected function _afterSave(Mage_Core_Model_Abstract $object)
     {
@@ -160,6 +153,12 @@ class Oggetto_News_Model_Resource_Category
         }
     }
 
+    /**
+     * Update url path after move
+     *
+     * @param Oggetto_News_Model_Category $category Category
+     * @return void
+     */
     public function updateUrlPath($category)
     {
         $this->_saveUrlPath($category);
@@ -168,9 +167,8 @@ class Oggetto_News_Model_Resource_Category
     /**
      * Update path field
      *
-     * @param Oggetto_News_Model_Category $object
+     * @param Oggetto_News_Model_Category $object Category
      * @return Oggetto_News_Model_Resource_Category
-     * @author Ultimate Module Creator
      */
     protected function _savePath($object)
     {
@@ -187,9 +185,8 @@ class Oggetto_News_Model_Resource_Category
     /**
      * Get maximum position of child categories by specific tree path
      *
-     * @param string $path
+     * @param string $path Category path
      * @return int
-     * @author Ultimate Module Creator
      */
     protected function _getMaxPosition($path)
     {
@@ -215,9 +212,8 @@ class Oggetto_News_Model_Resource_Category
     /**
      * Get children categories count
      *
-     * @param int $categoryId
+     * @param int $categoryId Category id
      * @return int
-     * @author Ultimate Module Creator
      */
     public function getChildrenCount($categoryId)
     {
@@ -231,9 +227,8 @@ class Oggetto_News_Model_Resource_Category
     /**
      * Check if category id exist
      *
-     * @param int $entityId
+     * @param int $entityId Category id
      * @return bool
-     * @author Ultimate Module Creator
      */
     public function checkId($entityId)
     {
@@ -247,9 +242,8 @@ class Oggetto_News_Model_Resource_Category
     /**
      * Check array of categories identifiers
      *
-     * @param array $ids
+     * @param array $ids Category ids
      * @return array
-     * @author Ultimate Module Creator
      */
     public function verifyIds(array $ids)
     {
@@ -266,10 +260,9 @@ class Oggetto_News_Model_Resource_Category
     /**
      * Get count of active/not active children categories
      *
-     * @param Oggetto_News_Model_Category $category
-     * @param bool $isActiveFlag
+     * @param Oggetto_News_Model_Category $category     Category
+     * @param bool                        $isActiveFlag Is active flag
      * @return int
-     * @author Ultimate Module Creator
      */
     public function getChildrenAmount($category, $isActiveFlag = true)
     {
@@ -287,9 +280,8 @@ class Oggetto_News_Model_Resource_Category
     /**
      * Return parent categories of category
      *
-     * @param Oggetto_News_Model_Category $category
+     * @param Oggetto_News_Model_Category $category Category
      * @return array
-     * @author Ultimate Module Creator
      */
     public function getParentCategories($category)
     {
@@ -304,9 +296,8 @@ class Oggetto_News_Model_Resource_Category
     /**
      * Return child categories
      *
-     * @param Oggetto_News_Model_Category $category
+     * @param Oggetto_News_Model_Category $category Category
      * @return Oggetto_News_Model_Resource_Category_Collection
-     * @author Ultimate Module Creator
      */
     public function getChildrenCategories($category)
     {
@@ -321,18 +312,17 @@ class Oggetto_News_Model_Resource_Category
     /**
      * Return children ids of category
      *
-     * @param Oggetto_News_Model_Category $category
-     * @param boolean $recursive
+     * @param Oggetto_News_Model_Category $category  Category
+     * @param boolean                     $recursive Is recursive
      * @return array
-     * @author Ultimate Module Creator
      */
     public function getChildren($category, $recursive = true)
     {
-        $bind = array(
+        $bind = [
             'c_path' => $category->getPath() . '/%'
-        );
+        ];
         $select = $this->_getReadAdapter()->select()
-            ->from(array('m' => $this->getMainTable()), 'entity_id')
+            ->from(['m' => $this->getMainTable()], 'entity_id')
             ->where('status = ?', 1)
             ->where($this->_getReadAdapter()->quoteIdentifier('path') . ' LIKE :c_path');
         if (!$recursive) {
@@ -346,9 +336,8 @@ class Oggetto_News_Model_Resource_Category
      * Process category data before saving
      * prepare path and increment children count for parent categories
      *
-     * @param Varien_Object $object
+     * @param Mage_Core_Model_Abstract $object Category
      * @return Oggetto_News_Model_Resource_Category
-     * @author Ultimate Module Creator
      */
     protected function _beforeSave(Mage_Core_Model_Abstract $object)
     {
@@ -406,13 +395,12 @@ class Oggetto_News_Model_Resource_Category
     /**
      * Retrieve categories
      *
-     * @param integer $parent
-     * @param integer $recursionLevel
-     * @param boolean|string $sorted
-     * @param boolean $asCollection
-     * @param boolean $toLoad
+     * @param int            $parent         Parent category node
+     * @param int            $recursionLevel Recursion level
+     * @param boolean|string $sorted         Is sorted
+     * @param boolean        $asCollection   As collection
+     * @param boolean        $toLoad         To load
      * @return Varien_Data_Tree_Node_Collection|Oggetto_News_Model_Resource_Category_Collection
-     * @author Ultimate Module Creator
      */
     public function getCategories($parent, $recursionLevel = 0, $sorted = false, $asCollection = false, $toLoad = true)
     {
@@ -430,9 +418,8 @@ class Oggetto_News_Model_Resource_Category
     /**
      * Return all children ids of category (with category id)
      *
-     * @param Oggetto_News_Model_Category $category
+     * @param Oggetto_News_Model_Category $category Category
      * @return array
-     * @author Ultimate Module Creator
      */
     public function getAllChildren($category)
     {
@@ -445,9 +432,8 @@ class Oggetto_News_Model_Resource_Category
     /**
      * Check category is forbidden to delete.
      *
-     * @param integer $categoryId
+     * @param int $categoryId Category
      * @return boolean
-     * @author Ultimate Module Creator
      */
     public function isForbiddenToDelete($categoryId)
     {
@@ -457,9 +443,8 @@ class Oggetto_News_Model_Resource_Category
     /**
      * Get category path value by its id
      *
-     * @param int $categoryId
+     * @param int $categoryId Category id
      * @return string
-     * @author Ultimate Module Creator
      */
     public function getCategoryPathById($categoryId)
     {
@@ -473,14 +458,16 @@ class Oggetto_News_Model_Resource_Category
     /**
      * Move category to another parent node
      *
-     * @param Oggetto_News_Model_Category $category
-     * @param Oggetto_News_Model_Category $newParent
-     * @param null|int $afterCategoryId
+     * @param Oggetto_News_Model_Category $category        Category
+     * @param Oggetto_News_Model_Category $newParent       New category parent
+     * @param null|int                    $afterCategoryId Id category after
      * @return Oggetto_News_Model_Resource_Category
-     * @author Ultimate Module Creator
      */
-    public function changeParent(Oggetto_News_Model_Category $category, Oggetto_News_Model_Category $newParent, $afterCategoryId = null)
-    {
+    public function changeParent(
+        Oggetto_News_Model_Category $category,
+        Oggetto_News_Model_Category $newParent,
+        $afterCategoryId = null
+    ) {
         $childrenCount = $this->getChildrenCount($category->getId()) + 1;
         $table = $this->getMainTable();
         $adapter = $this->_getWriteAdapter();
@@ -542,11 +529,10 @@ class Oggetto_News_Model_Resource_Category
      * Process positions of old parent category children and new parent category children.
      * Get position for moved category
      *
-     * @param Oggetto_News_Model_Category $category
-     * @param Oggetto_News_Model_Category $newParent
-     * @param null|int $afterCategoryId
+     * @param Oggetto_News_Model_Category $category        Category
+     * @param Oggetto_News_Model_Category $newParent       New category parent
+     * @param null|int                    $afterCategoryId Id category after
      * @return int
-     * @author Ultimate Module Creator
      */
     protected function _processPositions($category, $newParent, $afterCategoryId)
     {
@@ -554,13 +540,13 @@ class Oggetto_News_Model_Resource_Category
         $adapter = $this->_getWriteAdapter();
         $positionField = $adapter->quoteIdentifier('position');
 
-        $bind = array(
+        $bind = [
             'position' => new Zend_Db_Expr($positionField . ' - 1')
-        );
-        $where = array(
+        ];
+        $where = [
             'parent_id = ?' => $category->getParentId(),
             $positionField . ' > ?' => $category->getPosition()
-        );
+        ];
         $adapter->update($table, $bind, $where);
 
         /**
@@ -571,47 +557,46 @@ class Oggetto_News_Model_Resource_Category
                 ->from($table, 'position')
                 ->where('entity_id = :entity_id');
             $position = $adapter->fetchOne($select, array('entity_id' => $afterCategoryId));
-            $bind = array(
+            $bind = [
                 'position' => new Zend_Db_Expr($positionField . ' + 1')
-            );
-            $where = array(
+            ];
+            $where = [
                 'parent_id = ?' => $newParent->getId(),
                 $positionField . ' > ?' => $position
-            );
+            ];
             $adapter->update($table, $bind, $where);
         } elseif ($afterCategoryId !== null) {
             $position = 0;
-            $bind = array(
+            $bind = [
                 'position' => new Zend_Db_Expr($positionField . ' + 1')
-            );
-            $where = array(
+            ];
+            $where = [
                 'parent_id = ?' => $newParent->getId(),
                 $positionField . ' > ?' => $position
-            );
+            ];
             $adapter->update($table, $bind, $where);
         } else {
             $select = $adapter->select()
-                ->from($table, array('position' => new Zend_Db_Expr('MIN(' . $positionField . ')')))
+                ->from($table, ['position' => new Zend_Db_Expr('MIN(' . $positionField . ')')])
                 ->where('parent_id = :parent_id');
-            $position = $adapter->fetchOne($select, array('parent_id' => $newParent->getId()));
+            $position = $adapter->fetchOne($select, ['parent_id' => $newParent->getId()]);
         }
         $position += 1;
         return $position;
     }
 
     /**
-     * check url key
+     * Check url path
      *
-     * @param string $urlKey
-     * @param int $storeId
-     * @param bool $active
-     * @return mixed
-     * @author Ultimate Module Creator
+     * @param string $urlPath Url path
+     * @param int    $storeId Store id
+     * @param bool   $active  Is active
+     * @return string
      */
-    public function checkUrlPath($urlKey, $storeId, $active = true)
+    public function checkUrlPath($urlPath, $storeId, $active = true)
     {
         $stores = array(Mage_Core_Model_App::ADMIN_STORE_ID, $storeId);
-        $select = $this->_initCheckUrlPathSelect($urlKey, $stores);
+        $select = $this->_initCheckUrlPathSelect($urlPath, $stores);
         if ($active) {
             $select->where('e.status = ?', $active);
         }
@@ -623,13 +608,12 @@ class Oggetto_News_Model_Resource_Category
     }
 
     /**
-     * check url key
+     * Check url key
      *
-     * @param string $urlKey
-     * @param int $storeId
-     * @param bool $active
-     * @return mixed
-     * @author Ultimate Module Creator
+     * @param string $urlKey  Url key
+     * @param int    $storeId Store id
+     * @param bool   $active  Is active
+     * @return string
      */
     public function checkUrlKey($urlKey, $storeId, $active = true)
     {
@@ -648,9 +632,8 @@ class Oggetto_News_Model_Resource_Category
     /**
      * Check for unique URL key
      *
-     * @param Mage_Core_Model_Abstract $object
+     * @param Mage_Core_Model_Abstract $object Category
      * @return bool
-     * @author Ultimate Module Creator
      */
     public function getIsUniqueUrlKey(Mage_Core_Model_Abstract $object)
     {
@@ -667,9 +650,8 @@ class Oggetto_News_Model_Resource_Category
     /**
      * Check if the URL key is numeric
      *
-     * @param Mage_Core_Model_Abstract $object
+     * @param Mage_Core_Model_Abstract $object Category
      * @return bool
-     * @author Ultimate Module Creator
      */
     protected function isNumericUrlKey(Mage_Core_Model_Abstract $object)
     {
@@ -677,11 +659,10 @@ class Oggetto_News_Model_Resource_Category
     }
 
     /**
-     * Checkif the URL key is valid
+     * Check if the URL key is valid
      *
-     * @param Mage_Core_Model_Abstract $object
+     * @param Mage_Core_Model_Abstract $object Category
      * @return bool
-     * @author Ultimate Module Creator
      */
     protected function isValidUrlKey(Mage_Core_Model_Abstract $object)
     {
@@ -689,11 +670,10 @@ class Oggetto_News_Model_Resource_Category
     }
 
     /**
-     * format string as url key
+     * Format string as url key
      *
-     * @param string $str
+     * @param string $str Url key as string
      * @return string
-     * @author Ultimate Module Creator
      */
     public function formatUrlKey($str)
     {
@@ -704,12 +684,10 @@ class Oggetto_News_Model_Resource_Category
     }
 
     /**
-     * init the check select
+     * Init the check select by url path
      *
-     * @param string $urlKey
-     * @param array $store
+     * @param string $urlPath Url path
      * @return Zend_Db_Select
-     * @author Ultimate Module Creator
      */
     protected function _initCheckUrlPathSelect($urlPath)
     {
@@ -720,12 +698,10 @@ class Oggetto_News_Model_Resource_Category
     }
 
     /**
-     * init the check select
+     * Init the check select by url key
      *
-     * @param string $urlKey
-     * @param array $store
+     * @param string $urlKey Url key
      * @return Zend_Db_Select
-     * @author Ultimate Module Creator
      */
     protected function _initCheckUrlKeySelect($urlKey)
     {

@@ -209,12 +209,10 @@ class Oggetto_News_Model_Resource_Post extends Mage_Core_Model_Resource_Db_Abstr
     }
 
     /**
-     * init the check select
+     * Init the check select by url key
      *
-     * @param string $urlKey
-     * @param array $store
+     * @param string $urlKey Url key
      * @return Zend_Db_Select
-     * @author Ultimate Module Creator
      */
     protected function _initCheckUrlKeySelect($urlKey)
     {
@@ -223,5 +221,4 @@ class Oggetto_News_Model_Resource_Post extends Mage_Core_Model_Resource_Db_Abstr
             ->where('e.url_key = ?', $urlKey);
         return $select;
     }
-
 }

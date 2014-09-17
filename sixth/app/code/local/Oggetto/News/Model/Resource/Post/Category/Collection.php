@@ -30,20 +30,18 @@
  * @subpackage Model
  * @author     Eduard Paliy <epaliy@oggettoweb.com>
  */
-class Oggetto_News_Model_Resource_Post_Category_Collection
-    extends Oggetto_News_Model_Resource_Category_Collection
+class Oggetto_News_Model_Resource_Post_Category_Collection extends Oggetto_News_Model_Resource_Category_Collection
 {
     /**
-     * remember if fields have been joined
+     * Remember if fields have been joined
      * @var bool
      */
     protected $_joinedFields = false;
 
     /**
-     * join the link table
+     * Join the link table
      *
      * @return Oggetto_News_Model_Resource_Post_Category_Collection
-     * @author Ultimate Module Creator
      */
     public function joinFields()
     {
@@ -59,11 +57,10 @@ class Oggetto_News_Model_Resource_Post_Category_Collection
     }
 
     /**
-     * add post filter
+     * Add post filter
      *
-     * @param Oggetto_News_Model_Post | int $post
+     * @param Oggetto_News_Model_Post|int $post Post
      * @return Oggetto_News_Model_Resource_Post_Category_Collection
-     * @author Ultimate Module Creator
      */
     public function addPostFilter($post)
     {

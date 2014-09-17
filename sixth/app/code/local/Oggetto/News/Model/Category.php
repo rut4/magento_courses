@@ -30,8 +30,7 @@
  * @subpackage Model
  * @author     Eduard Paliy <epaliy@oggettoweb.com>
  */
-class Oggetto_News_Model_Category
-    extends Mage_Core_Model_Abstract
+class Oggetto_News_Model_Category extends Mage_Core_Model_Abstract
 {
     /**
      * Entity code.

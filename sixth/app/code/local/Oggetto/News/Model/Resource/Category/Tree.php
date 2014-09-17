@@ -30,19 +30,20 @@
  * @subpackage Model
  * @author     Eduard Paliy <epaliy@oggettoweb.com>
  */
-class Oggetto_News_Model_Resource_Category_Tree
-    extends Varien_Data_Tree_Dbp
+class Oggetto_News_Model_Resource_Category_Tree extends Varien_Data_Tree_Dbp
 {
     const ID_FIELD = 'entity_id';
     const PATH_FIELD = 'path';
     const ORDER_FIELD = 'order';
     const LEVEL_FIELD = 'level';
+
     /**
      * Categories resource collection
      * @var Oggetto_News_Model_Resource_Category_Collection
      */
     protected $_collection;
     protected $_storeId;
+
     /**
      * Inactive categories ids
      * @var array
@@ -50,10 +51,7 @@ class Oggetto_News_Model_Resource_Category_Tree
     protected $_inactiveCategoryIds = null;
 
     /**
-     * Initialize tree
-     *
-     * @return void
-     * @author Ultimate Module Creator
+     * Class constructor
      */
     public function __construct()
     {
@@ -73,9 +71,8 @@ class Oggetto_News_Model_Resource_Category_Tree
     /**
      * Get categories collection
      *
-     * @param boolean $sorted
+     * @param boolean $sorted Is sorted
      * @return Oggetto_News_Model_Resource_Category_Collection
-     * @author Ultimate Module Creator
      */
     public function getCollection($sorted = false)
     {
@@ -86,9 +83,9 @@ class Oggetto_News_Model_Resource_Category_Tree
     }
 
     /**
-     * set the collection
+     * Set the collection
      *
-     * @param Oggetto_News_Model_Resource_Category_Collection $collection
+     * @param Oggetto_News_Model_Resource_Category_Collection $collection Category collection
      * @return Oggetto_News_Model_Resource_Category_Tree
      */
     public function setCollection($collection)
@@ -101,9 +98,9 @@ class Oggetto_News_Model_Resource_Category_Tree
     }
 
     /**
-     * get the default collection
+     * Get the default collection
      *
-     * @param boolean $sorted
+     * @param boolean $sorted Is sorted
      * @return Oggetto_News_Model_Resource_Category_Collection
      */
     protected function _getDefaultCollection($sorted = false)
@@ -122,10 +119,10 @@ class Oggetto_News_Model_Resource_Category_Tree
     /**
      * Executing parents move method and cleaning cache after it
      *
-     * @param unknown_type $category
-     * @param unknown_type $newParent
-     * @param unknown_type $prevNode
-     * @author Ultimate Module Creator
+     * @param Varien_Data_Tree_Node $category  Category
+     * @param Varien_Data_Tree_Node $newParent New category parent
+     * @param Varien_Data_Tree_Node $prevNode  Previous node
+     * @return void
      */
     public function move($category, $newParent, $prevNode = null)
     {
@@ -137,9 +134,9 @@ class Oggetto_News_Model_Resource_Category_Tree
     /**
      * Move tree after
      *
-     * @param unknown_type $category
-     * @param Varien_Data_Tree_Node $newParent
-     * @param Varien_Data_Tree_Node $prevNode
+     * @param Varien_Data_Tree_Node $category  Category
+     * @param Varien_Data_Tree_Node $newParent New category parent
+     * @param Varien_Data_Tree_Node $prevNode  Previous node
      * @return Oggetto_News_Model_Resource_Category_Tree
      */
     protected function _afterMove($category, $newParent, $prevNode)
@@ -151,10 +148,9 @@ class Oggetto_News_Model_Resource_Category_Tree
     /**
      * Load whole category tree, that will include specified categories ids.
      *
-     * @param array $ids
-     * @param bool $addCollectionData
+     * @param array $ids               Category ids
+     * @param bool  $addCollectionData Should add collection data
      * @return Oggetto_News_Model_Resource_Category_Tree
-     * @author Ultimate Module Creator
      */
     public function loadByIds($ids, $addCollectionData = true)
     {
@@ -220,11 +216,10 @@ class Oggetto_News_Model_Resource_Category_Tree
     /**
      * Load array of category parents
      *
-     * @param string $path
-     * @param bool $addCollectionData
-     * @param bool $withRootNode
+     * @param string $path              Category path
+     * @param bool   $addCollectionData Should add collection data
+     * @param bool   $withRootNode      Should load with root node
      * @return array
-     * @author Ultimate Module Creator
      */
     public function loadBreadcrumbsArray($path, $addCollectionData = true, $withRootNode = false)
     {
@@ -249,69 +244,58 @@ class Oggetto_News_Model_Resource_Category_Tree
 
     /**
      * Obtain select for categories
-     * By default everything from entity table is selected
-     * + name
      *
-     * @param bool $sorted
-     * @param array $optionalAttributes
+     * @param bool $sorted Is sorted
      * @return Zend_Db_Select
-     * @author Ultimate Module Creator
      */
     protected function _createCollectionDataSelect($sorted = true)
     {
         $select = $this->_getDefaultCollection($sorted ? $this->_orderField : false)->getSelect();
-        $categoriesTable = Mage::getSingleton('core/resource')->getTableName('news/category');
-        $subConcat = $this->_conn->getConcatSql(array('main_table.path', $this->_conn->quote('/%')));
-        $subSelect = $this->_conn->select()
-            ->from(array('see' => $categoriesTable), null)
-            ->where('see.entity_id = main_table.entity_id')
-            ->orWhere('see.path LIKE ?', $subConcat);
         return $select;
     }
 
     /**
      * Get real existing category ids by specified ids
      *
-     * @param array $ids
+     * @param array $ids Category ids
      * @return array
-     * @author Ultimate Module Creator
      */
     public function getExistingCategoryIdsBySpecifiedIds($ids)
     {
         if (empty($ids)) {
-            return array();
+            return [];
         }
         if (!is_array($ids)) {
-            $ids = array($ids);
+            $ids = [$ids];
         }
         $select = $this->_conn->select()
-            ->from($this->_table, array('entity_id'))
+            ->from($this->_table, ['entity_id'])
             ->where('entity_id IN (?)', $ids);
         return $this->_conn->fetchCol($select);
     }
 
     /**
-     * add collection data
+     * Add collection data
      *
-     * @param Oggetto_News_Model_Resource_Category_Collection $collection
-     * @param boolean $sorted
-     * @param array $exclude
-     * @param boolean $toLoad
-     * @param boolean $onlyActive
+     * @param Oggetto_News_Model_Resource_Category_Collection $collection Category collection
+     * @param boolean                                         $sorted     Is sorted
+     * @param array                                           $exclude    Categories to exclude
+     * @param boolean                                         $toLoad     To load
+     * @param boolean                                         $onlyActive Add only active
      * @return Oggetto_News_Model_Resource_Category_Tree
-     * @author Ultimate Module Creator
      */
-    public function addCollectionData($collection = null, $sorted = false, $exclude = array(), $toLoad = true, $onlyActive = false)
-    {
+    public function addCollectionData(
+        $collection = null, $sorted = false, $exclude = [], $toLoad = true, $onlyActive = false
+    ) {
         if (is_null($collection)) {
             $collection = $this->getCollection($sorted);
         } else {
             $this->setCollection($collection);
         }
         if (!is_array($exclude)) {
-            $exclude = array($exclude);
+            $exclude = [$exclude];
         }
-        $nodeIds = array();
+        $nodeIds = [];
         foreach ($this->getNodes() as $node) {
             if (!in_array($node->getId(), $exclude)) {
                 $nodeIds[] = $node->getId();
@@ -321,7 +305,7 @@ class Oggetto_News_Model_Resource_Category_Tree
         if ($onlyActive) {
             $disabledIds = $this->_getDisabledIds($collection);
             if ($disabledIds) {
-                $collection->addFieldToFilter('entity_id', array('nin' => $disabledIds));
+                $collection->addFieldToFilter('entity_id', ['nin' => $disabledIds]);
             }
             $collection->addFieldToFilter('status', 1);
         }
@@ -344,9 +328,8 @@ class Oggetto_News_Model_Resource_Category_Tree
     /**
      * Add inactive categories ids
      *
-     * @param unknown_type $ids
+     * @param array $ids Category ids
      * @return Oggetto_News_Model_Resource_Category_Tree
-     * @author Ultimate Module Creator
      */
     public function addInactiveCategoryIds($ids)
     {
@@ -361,11 +344,10 @@ class Oggetto_News_Model_Resource_Category_Tree
      * Retrieve inactive categories ids
      *
      * @return Oggetto_News_Model_Resource_Category_Tree
-     * @author Ultimate Module Creator
      */
     protected function _initInactiveCategoryIds()
     {
-        $this->_inactiveCategoryIds = array();
+        $this->_inactiveCategoryIds = [];
         return $this;
     }
 
@@ -373,7 +355,6 @@ class Oggetto_News_Model_Resource_Category_Tree
      * Retrieve inactive categories ids
      *
      * @return array
-     * @author Ultimate Module Creator
      */
     public function getInactiveCategoryIds()
     {
@@ -386,9 +367,8 @@ class Oggetto_News_Model_Resource_Category_Tree
     /**
      * Return disable category ids
      *
-     * @param Oggetto_News_Model_Resource_Category_Collection $collection
+     * @param Oggetto_News_Model_Resource_Category_Collection $collection Category collection
      * @return array
-     * @author Ultimate Module Creator
      */
     protected function _getDisabledIds($collection)
     {
@@ -398,7 +378,7 @@ class Oggetto_News_Model_Resource_Category_Tree
             $this->_inactiveItems
         );
         $allIds = $collection->getAllIds();
-        $disabledIds = array();
+        $disabledIds = [];
 
         foreach ($allIds as $id) {
             $parents = $this->getNodeById($id)->getPath();
@@ -414,20 +394,19 @@ class Oggetto_News_Model_Resource_Category_Tree
 
     /**
      * Retrieve inactive category item ids
-     * @access protecte
-     * @param Oggetto_News_Model_Resource_Category_Collection $collection
+     *
+     * @param Oggetto_News_Model_Resource_Category_Collection $collection Category collection
      * @return array
-     * @author Ultimate Module Creator
      */
     protected function _getInactiveItemIds($collection)
     {
         $filter = $collection->getAllIdsSql();
         $table = Mage::getSingleton('core/resource')->getTable('news/category');
-        $bind = array(
+        $bind = [
             'cond' => 0,
-        );
+        ];
         $select = $this->_conn->select()
-            ->from(array('d' => $table), array('d.entity_id'))
+            ->from(['d' => $table], ['d.entity_id'])
             ->where('d.entity_id IN (?)', new Zend_Db_Expr($filter))
             ->where('status = :cond');
         return $this->_conn->fetchCol($select, $bind);
@@ -435,10 +414,9 @@ class Oggetto_News_Model_Resource_Category_Tree
 
     /**
      * Check is category items active
-     * @access protecte
-     * @param int $id
+     *
+     * @param int $id Category id
      * @return boolean
-     * @author Ultimate Module Creator
      */
     protected function _getItemIsActive($id)
     {

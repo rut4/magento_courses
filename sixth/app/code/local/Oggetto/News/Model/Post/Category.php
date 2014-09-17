@@ -36,7 +36,6 @@ class Oggetto_News_Model_Post_Category extends Mage_Core_Model_Abstract
      * Initialize resource
      *
      * @return void
-     * @author Ultimate Module Creator
      */
     protected function _construct()
     {

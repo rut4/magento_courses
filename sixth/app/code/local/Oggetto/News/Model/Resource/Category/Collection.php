@@ -97,7 +97,7 @@ class Oggetto_News_Model_Resource_Category_Collection extends Mage_Core_Model_Re
             $paths = [$paths];
         }
         $write = $this->getResource()->getWriteConnection();
-        $cond = array();
+        $cond = [];
         foreach ($paths as $path) {
             $cond[] = $write->quoteInto('e.path LIKE ?', "$path%");
         }
@@ -108,14 +108,26 @@ class Oggetto_News_Model_Resource_Category_Collection extends Mage_Core_Model_Re
     }
 
     /**
+     * Add order field
+     *
+     * @param string $field Field
+     * @return Oggetto_News_Model_Resource_Category_Collection
+     */
+    public function addOrderField($field)
+    {
+        $this->setOrder($field, self::SORT_ORDER_ASC);
+        return $this;
+    }
+
+    /**
      * Add category level filter
      *
-     * @param int|string $level
+     * @param int|string $level Category level
      * @return Oggetto_News_Model_Resource_Category_Collection
      */
     public function addLevelFilter($level)
     {
-        $this->addFieldToFilter('level', array('lteq' => $level));
+        $this->addFieldToFilter('level', ['lteq' => $level]);
         return $this;
     }
 
@@ -132,20 +144,9 @@ class Oggetto_News_Model_Resource_Category_Collection extends Mage_Core_Model_Re
     }
 
     /**
-     * Add order field
-     *
-     * @param string $field
-     * @return Oggetto_News_Model_Resource_Category_Collection
-     */
-    public function addOrderField($field)
-    {
-        $this->setOrder($field, self::SORT_ORDER_ASC);
-        return $this;
-    }
-
-    /**
      * Add active category filter
      *
+     * @param int $status Status
      * @return Oggetto_News_Model_Resource_Category_Collection
      */
     public function addStatusFilter($status = 1)
@@ -157,14 +158,14 @@ class Oggetto_News_Model_Resource_Category_Collection extends Mage_Core_Model_Re
     /**
      * get categories as array
      *
-     * @param string $valueField
-     * @param string $labelField
-     * @param array $additional
+     * @param string $valueField Value field
+     * @param string $labelField Label field
+     * @param array  $additional Additional data
      * @return array
      */
-    protected function _toOptionArray($valueField = 'entity_id', $labelField = 'name', $additional = array())
+    protected function _toOptionArray($valueField = 'entity_id', $labelField = 'name', $additional = [])
     {
-        $res = array();
+        $res = [];
         $additional['value'] = $valueField;
         $additional['label'] = $labelField;
 

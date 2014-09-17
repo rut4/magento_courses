@@ -30,17 +30,14 @@
  * @subpackage Model
  * @author     Eduard Paliy <epaliy@oggettoweb.com>
  */
-class Oggetto_News_Model_Resource_Post_Category
-    extends Mage_Core_Model_Resource_Db_Abstract
+class Oggetto_News_Model_Resource_Post_Category extends Mage_Core_Model_Resource_Db_Abstract
 {
     /**
-     * initialize resource model
+     * Initialization with main table and id field name
      *
      * @return void
-     * @see Mage_Core_Model_Resource_Abstract::_construct()
-     * @author Ultimate Module Creator
      */
-    protected function  _construct()
+    protected function _construct()
     {
         $this->_init('news/post_category', 'rel_id');
     }
@@ -48,10 +45,9 @@ class Oggetto_News_Model_Resource_Post_Category
     /**
      * Save post - category relations
      *
-     * @param Oggetto_News_Model_Post $post
-     * @param array $data
+     * @param Oggetto_News_Model_Post $post        Post
+     * @param array                   $categoryIds Category ids
      * @return Oggetto_News_Model_Resource_Post_Category
-     * @author Ultimate Module Creator
      */
     public function savePostRelation($post, $categoryIds)
     {

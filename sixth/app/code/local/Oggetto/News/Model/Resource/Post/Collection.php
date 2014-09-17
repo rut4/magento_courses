@@ -30,16 +30,14 @@
  * @subpackage Model
  * @author     Eduard Paliy <epaliy@oggettoweb.com>
  */
-class Oggetto_News_Model_Resource_Post_Collection
-    extends Mage_Core_Model_Resource_Db_Collection_Abstract
+class Oggetto_News_Model_Resource_Post_Collection  extends Mage_Core_Model_Resource_Db_Collection_Abstract
 {
-    protected $_joinedFields = array();
+    protected $_joinedFields = [];
 
     /**
-     * constructor
+     * Initialization with model
      *
      * @return void
-     * @author Ultimate Module Creator
      */
     protected function _construct()
     {
@@ -48,26 +46,24 @@ class Oggetto_News_Model_Resource_Post_Collection
     }
 
     /**
-     * get posts as array
+     * Get posts as array
      *
-     * @param string $valueField
-     * @param string $labelField
-     * @param array $additional
+     * @param string $valueField Value field
+     * @param string $labelField Label field
+     * @param array  $additional Additional
      * @return array
-     * @author Ultimate Module Creator
      */
-    protected function _toOptionArray($valueField = 'entity_id', $labelField = 'title', $additional = array())
+    protected function _toOptionArray($valueField = 'entity_id', $labelField = 'title', $additional = [])
     {
         return parent::_toOptionArray($valueField, $labelField, $additional);
     }
 
     /**
-     * get options hash
+     * Get options hash
      *
-     * @param string $valueField
-     * @param string $labelField
+     * @param string $valueField Value field
+     * @param string $labelField Label field
      * @return array
-     * @author Ultimate Module Creator
      */
     protected function _toOptionHash($valueField = 'entity_id', $labelField = 'title')
     {
@@ -75,11 +71,10 @@ class Oggetto_News_Model_Resource_Post_Collection
     }
 
     /**
-     * add the category filter to collection
+     * Add the category filter to collection
      *
-     * @param mixed (Oggetto_News_Model_Category|int) $category
+     * @param Oggetto_News_Model_Category|int $category Category or it's id
      * @return Oggetto_News_Model_Resource_Post_Collection
-     * @author Ultimate Module Creator
      */
     public function addCategoryFilter($category)
     {
@@ -103,7 +98,6 @@ class Oggetto_News_Model_Resource_Post_Collection
      * Extra GROUP BY strip added.
      *
      * @return Varien_Db_Select
-     * @author Ultimate Module Creator
      */
     public function getSelectCountSql()
     {

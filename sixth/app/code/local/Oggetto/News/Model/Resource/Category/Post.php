@@ -21,6 +21,7 @@
  * @copyright  Copyright (C) 2014 Oggetto Web ltd (http://oggettoweb.com/)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
+
 /**
  * Category - Post relation model
  *
@@ -29,17 +30,14 @@
  * @subpackage Model
  * @author     Eduard Paliy <epaliy@oggettoweb.com>
  */
-class Oggetto_News_Model_Resource_Category_Post
-    extends Mage_Core_Model_Resource_Db_Abstract
+class Oggetto_News_Model_Resource_Category_Post extends Mage_Core_Model_Resource_Db_Abstract
 {
     /**
-     * initialize resource model
+     * Initialization resource model with main table and id field name
      *
      * @return void
-     * @see Mage_Core_Model_Resource_Abstract::_construct()
-     * @author Ultimate Module Creator
      */
-    protected function  _construct()
+    protected function _construct()
     {
         $this->_init('news/category_post', 'rel_id');
     }
@@ -47,44 +45,43 @@ class Oggetto_News_Model_Resource_Category_Post
     /**
      * Save category - post relations
      *
-     * @param Oggetto_News_Model_Category $category
-     * @param array $data
+     * @param Oggetto_News_Model_Category $category Category
+     * @param array                       $data     Data array
      * @return Oggetto_News_Model_Resource_Category_Post
-     * @author Ultimate Module Creator
      */
     public function saveCategoryRelation($category, $data)
     {
         if (!is_array($data)) {
-            $data = array();
+            $data = [];
         }
 
         $adapter = $this->_getWriteAdapter();
-        $bind = array(
+        $bind = [
             ':category_id' => (int)$category->getId(),
-        );
+        ];
         $select = $adapter->select()
-            ->from($this->getMainTable(), array('rel_id', 'post_id'))
+            ->from($this->getMainTable(), ['rel_id', 'post_id'])
             ->where('category_id = :category_id');
 
         $related = $adapter->fetchPairs($select, $bind);
-        $deleteIds = array();
+        $deleteIds = [];
         foreach ($related as $relId => $postId) {
             if (!isset($data[$postId])) {
                 $deleteIds[] = (int)$relId;
             }
         }
         if (!empty($deleteIds)) {
-            $adapter->delete($this->getMainTable(), array(
+            $adapter->delete($this->getMainTable(), [
                 'rel_id IN (?)' => $deleteIds,
-            ));
+            ]);
         }
 
         foreach ($data as $postId => $info) {
-            $adapter->insertOnDuplicate($this->getMainTable(), array(
+            $adapter->insertOnDuplicate($this->getMainTable(), [
                 'category_id' => $category->getId(),
                 'post_id' => $postId,
                 'position' => @$info['position']
-            ), array('position'));
+            ], ['position']);
         }
         return $this;
     }
