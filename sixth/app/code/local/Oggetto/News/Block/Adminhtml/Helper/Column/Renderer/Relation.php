@@ -23,7 +23,8 @@
  */
 
 /**
- * related entities column renderer
+ * Related entities column renderer
+ *
  * @category   Oggetto
  * @package    Oggetto_News
  * @subpackage Block
@@ -33,11 +34,10 @@ class Oggetto_News_Block_Adminhtml_Helper_Column_Renderer_Relation
     extends Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Text
 {
     /**
-     * render the column
+     * Render the column
      *
-     * @param Varien_Object $row
+     * @param Varien_Object $row Grid row
      * @return string
-     * @author Ultimate Module Creator
      */
     public function render(Varien_Object $row)
     {

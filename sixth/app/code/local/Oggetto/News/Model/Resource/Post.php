@@ -30,7 +30,7 @@
  * @subpackage Model
  * @author     Eduard Paliy <epaliy@oggettoweb.com>
  */
-class Oggetto_News_Model_Resource_Post extends Mage_Core_Model_Resource_Db_Abstract
+class Oggetto_News_Model_Resource_Post extends Oggetto_News_Model_Resource_Entity
 {
     /**
      * Initialization with main table and id field name
@@ -61,81 +61,6 @@ class Oggetto_News_Model_Resource_Post extends Mage_Core_Model_Resource_Db_Abstr
         return $this->_getReadAdapter()->fetchOne($select);
     }
 
-    /**
-     * Check url key
-     *
-     * @param string $urlKey  Url key
-     * @param int    $storeId Store id
-     * @param bool   $active  Is active
-     * @return mixed
-     */
-    public function checkUrlKey($urlKey, $storeId, $active = true)
-    {
-        $select = $this->_initCheckUrlKeySelect($urlKey);
-        if ($active) {
-            $select->where('e.status = ?', $active);
-        }
-
-        $select->reset(Zend_Db_Select::COLUMNS)
-            ->columns('e.entity_id')
-            ->limit(1);
-
-        return $this->_getReadAdapter()->fetchOne($select);
-    }
-
-    /**
-     * Check for unique URL key
-     *
-     * @param Mage_Core_Model_Abstract $object Post
-     * @return bool
-     */
-    public function getIsUniqueUrlKey(Mage_Core_Model_Abstract $object)
-    {
-        $select = $this->_initCheckUrlKeySelect($object->getData('url_key'));
-        if ($object->getId()) {
-            $select->where('e.entity_id <> ?', $object->getId());
-        }
-        if ($this->_getWriteAdapter()->fetchRow($select)) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Check if the URL key is numeric
-     *
-     * @param Mage_Core_Model_Abstract $object Post
-     * @return bool
-     */
-    protected function isNumericUrlKey(Mage_Core_Model_Abstract $object)
-    {
-        return preg_match('/^[0-9]+$/', $object->getData('url_key'));
-    }
-
-    /**
-     * Check if the URL key is valid
-     *
-     * @param Mage_Core_Model_Abstract $object Post
-     * @return bool
-     */
-    protected function isValidUrlKey(Mage_Core_Model_Abstract $object)
-    {
-        return preg_match('/^[a-z0-9][a-z0-9_\/-]+(\.[a-z0-9_-]+)?$/', $object->getData('url_key'));
-    }
-
-    /**
-     * Format string as url key
-     *
-     * @param string $str String as url key
-     * @return string
-     */
-    public function formatUrlKey($str)
-    {
-        $urlKey = preg_replace('#[^0-9a-z]+#i', '-', Mage::helper('catalog/product_url')->format($str));
-        $urlKey = strtolower($urlKey);
-        $urlKey = trim($urlKey, '-');
-        return $urlKey;
-    }
 
     /**
      * Init the check select by url path
@@ -166,7 +91,7 @@ class Oggetto_News_Model_Resource_Post extends Mage_Core_Model_Resource_Db_Abstr
         $urlKey = $this->formatUrlKey($urlKey);
         $validKey = false;
         while (!$validKey) {
-            $entityId = $this->checkUrlKey($urlKey, $object->getStoreId(), false);
+            $entityId = $this->checkUrlKey($urlKey, false);
             if ($entityId == $object->getId() || empty($entityId)) {
                 $validKey = true;
             } else {
@@ -206,19 +131,5 @@ class Oggetto_News_Model_Resource_Post extends Mage_Core_Model_Resource_Db_Abstr
                 );
             }
         }
-    }
-
-    /**
-     * Init the check select by url key
-     *
-     * @param string $urlKey Url key
-     * @return Zend_Db_Select
-     */
-    protected function _initCheckUrlKeySelect($urlKey)
-    {
-        $select = $this->_getReadAdapter()->select()
-            ->from(['e' => $this->getMainTable()])
-            ->where('e.url_key = ?', $urlKey);
-        return $select;
     }
 }

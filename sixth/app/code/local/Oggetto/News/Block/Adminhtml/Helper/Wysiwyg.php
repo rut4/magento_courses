@@ -24,8 +24,10 @@
 
 /**
  * News textarea attribute WYSIWYG button
+ *
  * @category   Oggetto
  * @package    Oggetto_News
+ * @subpackage Block
  * @author     Eduard Paliy <epaliy@oggettoweb.com>
  */
 class Oggetto_News_Block_Adminhtml_Helper_Wysiwyg extends Varien_Data_Form_Element_Textarea
