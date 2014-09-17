@@ -107,7 +107,10 @@ class Oggetto_News_Controller_Router extends Mage_Core_Controller_Varien_Router_
                 $urlKey = substr($urlKey, 0, -strlen($settings['suffix']) - 1);
             }
             $model = Mage::getModel($settings->getModel());
-            $id = $model->checkUrlKey($urlKey, Mage::app()->getStore()->getId());
+            $id = $model->checkUrlPath($urlKey);
+            if (!$id) {
+                $id = $model->checkUrlKey($urlKey);
+            }
             if ($id) {
                 if ($settings->getCheckPath() && !$model->load($id)->getStatusPath()) {
                     continue;

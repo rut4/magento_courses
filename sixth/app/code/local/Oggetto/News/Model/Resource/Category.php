@@ -132,8 +132,37 @@ class Oggetto_News_Model_Resource_Category
             $this->_savePath($object);
         }
 
-
+        if (!$object->getInitialSetupFlag() && !$object->getUrlPath()) {
+            $this->_saveUrlPath($object);
+        }
         return parent::_afterSave($object);
+    }
+
+    /**
+     * Save url path
+     *
+     * @param Mage_Core_Model_Abstract $object The category which has been saved
+     * @return void
+     */
+    protected function _saveUrlPath(Mage_Core_Model_Abstract $object)
+    {
+        if ($object->getId()) {
+            $urlKeys = [];
+            $idsPath = $this->getCategoryPathById($object->getId());
+            foreach (explode('/', $idsPath) as $id) {
+                $urlKeys[] = Mage::getModel('news/category')->load($id)->getUrlKey();
+            }
+            $this->_getWriteAdapter()->update(
+                $this->getMainTable(),
+                ['url_path' => trim(implode('/', $urlKeys), '/')],
+                ['entity_id = ?' => $object->getId()]
+            );
+        }
+    }
+
+    public function updateUrlPath($category)
+    {
+        $this->_saveUrlPath($category);
     }
 
     /**
@@ -331,7 +360,7 @@ class Oggetto_News_Model_Resource_Category
             $urlKey = $this->formatUrlKey($urlKey);
             $validKey = false;
             while (!$validKey) {
-                $entityId = $this->checkUrlKey($urlKey, $object->getStoreId(), false);
+                $entityId = $this->checkUrlPath($urlKey, $object->getStoreId(), false);
                 if ($entityId == $object->getId() || empty($entityId)) {
                     $validKey = true;
                 } else {
@@ -367,8 +396,8 @@ class Oggetto_News_Model_Resource_Category
             $toUpdateChild = explode('/', $object->getPath());
             $this->_getWriteAdapter()->update(
                 $this->getMainTable(),
-                array('children_count' => new Zend_Db_Expr('children_count+1')),
-                array('entity_id IN(?)' => $toUpdateChild)
+                ['children_count'  => new Zend_Db_Expr('children_count+1')],
+                ['entity_id IN(?)' => $toUpdateChild]
             );
         }
         return $this;
@@ -579,6 +608,29 @@ class Oggetto_News_Model_Resource_Category
      * @return mixed
      * @author Ultimate Module Creator
      */
+    public function checkUrlPath($urlKey, $storeId, $active = true)
+    {
+        $stores = array(Mage_Core_Model_App::ADMIN_STORE_ID, $storeId);
+        $select = $this->_initCheckUrlPathSelect($urlKey, $stores);
+        if ($active) {
+            $select->where('e.status = ?', $active);
+        }
+        $select->reset(Zend_Db_Select::COLUMNS)
+            ->columns('e.entity_id')
+            ->limit(1);
+
+        return $this->_getReadAdapter()->fetchOne($select);
+    }
+
+    /**
+     * check url key
+     *
+     * @param string $urlKey
+     * @param int $storeId
+     * @param bool $active
+     * @return mixed
+     * @author Ultimate Module Creator
+     */
     public function checkUrlKey($urlKey, $storeId, $active = true)
     {
         $stores = array(Mage_Core_Model_App::ADMIN_STORE_ID, $storeId);
@@ -602,12 +654,7 @@ class Oggetto_News_Model_Resource_Category
      */
     public function getIsUniqueUrlKey(Mage_Core_Model_Abstract $object)
     {
-        if (Mage::app()->isSingleStoreMode() || !$object->hasStores()) {
-            $stores = array(Mage_Core_Model_App::ADMIN_STORE_ID);
-        } else {
-            $stores = (array)$object->getData('stores');
-        }
-        $select = $this->_initCheckUrlKeySelect($object->getData('url_key'), $stores);
+        $select = $this->_initCheckUrlKeySelect($object->getData('url_key'));
         if ($object->getId()) {
             $select->where('e.entity_id <> ?', $object->getId());
         }
@@ -664,10 +711,26 @@ class Oggetto_News_Model_Resource_Category
      * @return Zend_Db_Select
      * @author Ultimate Module Creator
      */
-    protected function _initCheckUrlKeySelect($urlKey, $store)
+    protected function _initCheckUrlPathSelect($urlPath)
     {
         $select = $this->_getReadAdapter()->select()
-            ->from(array('e' => $this->getMainTable()))
+            ->from(['e' => $this->getMainTable()])
+            ->where('e.url_path = ?', $urlPath);
+        return $select;
+    }
+
+    /**
+     * init the check select
+     *
+     * @param string $urlKey
+     * @param array $store
+     * @return Zend_Db_Select
+     * @author Ultimate Module Creator
+     */
+    protected function _initCheckUrlKeySelect($urlKey)
+    {
+        $select = $this->_getReadAdapter()->select()
+            ->from(['e' => $this->getMainTable()])
             ->where('e.url_key = ?', $urlKey);
         return $select;
     }

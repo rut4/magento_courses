@@ -91,6 +91,7 @@ class Oggetto_News_Model_Resource_Post_Category
                 $write->delete($this->getMainTable(), $where);
             }
         }
+        $post->getResource()->updateUrlPath($post);
         return $this;
     }
 }

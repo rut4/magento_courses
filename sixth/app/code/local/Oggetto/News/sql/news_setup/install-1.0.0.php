@@ -33,8 +33,6 @@ $table = $this->getConnection()
     ->addColumn('name', Varien_Db_Ddl_Table::TYPE_TEXT, 255, [
         'nullable' => false,
     ], 'Name')
-    ->addColumn('status', Varien_Db_Ddl_Table::TYPE_SMALLINT, null, [], 'Enabled')
-    ->addColumn('url_key', Varien_Db_Ddl_Table::TYPE_TEXT, 255, [], 'URL key')
     ->addColumn('parent_id', Varien_Db_Ddl_Table::TYPE_INTEGER, null, [
         'unsigned' => true,
     ], 'Parent id')
@@ -48,6 +46,8 @@ $table = $this->getConnection()
     ->addColumn('children_count', Varien_Db_Ddl_Table::TYPE_INTEGER, null, [
         'unsigned' => true,
     ], 'Children count')
+    ->addColumn('url_key', Varien_Db_Ddl_Table::TYPE_TEXT, 255, [], 'URL key')
+    ->addColumn('url_path', Varien_Db_Ddl_Table::TYPE_TEXT, 511, [], 'URL path')
     ->addColumn('status', Varien_Db_Ddl_Table::TYPE_INTEGER, null, [], 'Category Status')
     ->addColumn('updated_at', Varien_Db_Ddl_Table::TYPE_TIMESTAMP, null, [], 'Category Modification Time')
     ->addColumn('created_at', Varien_Db_Ddl_Table::TYPE_TIMESTAMP, null, [], 'Category Creation Time')
@@ -66,7 +66,6 @@ $table = $this->getConnection()
     ->addColumn('text', Varien_Db_Ddl_Table::TYPE_TEXT, '64k', [
         'nullable' => false
     ], 'Text')
-    ->addColumn('status', Varien_Db_Ddl_Table::TYPE_SMALLINT, null, [], 'Enabled')
     ->addColumn('url_key', Varien_Db_Ddl_Table::TYPE_TEXT, 255, [], 'URL key')
     ->addColumn('status', Varien_Db_Ddl_Table::TYPE_INTEGER, null, [], 'Post Status')
     ->addColumn('updated_at', Varien_Db_Ddl_Table::TYPE_TIMESTAMP, null, [], 'Post Modification Time')
@@ -91,6 +90,7 @@ $table = $this->getConnection()
         'nullable' => false,
         'default' => '0'
     ], 'Post ID')
+    ->addColumn('url_path', Varien_Db_Ddl_Table::TYPE_TEXT, 255, [], 'URL path')
     ->addColumn('position', Varien_Db_Ddl_Table::TYPE_INTEGER, null, [
         'nullable' => false,
         'default' => '0'

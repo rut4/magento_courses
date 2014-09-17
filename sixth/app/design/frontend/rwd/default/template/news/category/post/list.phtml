@@ -27,21 +27,24 @@
  *
  * @category    Oggetto
  * @package     Oggetto_News
- * @author      Ultimate Module Creator
  */
 ?>
-<?php $_posts = $this->getPosts(); ?>
-<?php if ($_posts->getSize() > 0) :?>
-<div class="page-title post-title">
-    <h2><?php echo Mage::helper('news')->__('Posts') ?></h2>
-</div>
-<div class="posts-list-container">
-    <?php foreach ($_posts as $_post) : ?>
-        <div class="post-list-item">
-            <a href="<?php echo $_post->getPostUrl()?>">
-                <?php echo $_post->getTitle();?>
-            </a><br />
-        </div>
-    <?php endforeach;?>
-</div>
+<?php /** @var Oggetto_News_Block_Category_Post_List $this */ ?>
+<?php
+    $posts = $this->getPosts();
+    $category = $this->getCategory();
+?>
+<?php if ($posts->getSize() > 0) :?>
+    <div class="page-title post-title">
+        <h2><?php echo Mage::helper('news')->__('Posts') ?></h2>
+    </div>
+    <div class="posts-list-container">
+        <?php foreach ($posts as $post) : ?>
+            <div class="post-list-item">
+                <a href="<?php echo $this->getPostUrl($post); ?>">
+                    <?php echo $post->getTitle();?>
+                </a><br />
+            </div>
+        <?php endforeach;?>
+    </div>
 <?php endif;?>

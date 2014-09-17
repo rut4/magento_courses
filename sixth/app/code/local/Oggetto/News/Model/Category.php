@@ -87,16 +87,8 @@ class Oggetto_News_Model_Category
      */
     public function getCategoryUrl()
     {
-        if ($this->getUrlKey()) {
-            $urlKey = '';
-            if ($prefix = Mage::getStoreConfig('news/category/url_prefix')) {
-                $urlKey .= $prefix . '/';
-            }
-            $urlKey .= $this->getUrlKey();
-            if ($suffix = Mage::getStoreConfig('news/category/url_suffix')) {
-                $urlKey .= '.' . $suffix;
-            }
-            return Mage::getUrl('', array('_direct' => $urlKey));
+        if ($this->getUrlPath()) {
+            return Mage::getUrl('', array('_direct' => $this->getUrlPath()));
         }
         return Mage::getUrl('news/category/view', array('id' => $this->getId()));
     }
@@ -112,6 +104,19 @@ class Oggetto_News_Model_Category
     {
         return $this->_getResource()->checkUrlKey($urlKey, $active);
     }
+
+    /**
+     * Check URL path
+     *
+     * @param string $urlPath Url key
+     * @param bool   $active  Is active
+     * @return bool
+     */
+    public function checkUrlPath($urlPath, $active = true)
+    {
+        return $this->_getResource()->checkUrlPath($urlPath, $active);
+    }
+
 
     /**
      * Save category relation
@@ -229,6 +234,7 @@ class Oggetto_News_Model_Category
             $this->getResource()->changeParent($this, $parent, $afterCategoryId);
             $this->_getResource()->commit();
             $this->setAffectedCategoryIds(array($this->getId(), $this->getParentId(), $parentId));
+            $this->getResource()->updateUrlPath($this);
             $moveComplete = true;
         } catch (Exception $e) {
             $this->_getResource()->rollBack();
@@ -376,14 +382,17 @@ class Oggetto_News_Model_Category
     /**
      * Get the categories
      *
-     * @param Oggetto_News_Model_Category $parent
-     * @param int $recursionLevel
-     * @param bool $sorted
-     * @param bool $asCollection
-     * @param bool $toLoad
+     * @param Oggetto_News_Model_Category $parent         Parent category
+     * @param int                         $recursionLevel Recursion level
+     * @param bool                        $sorted         Is sorted
+     * @param bool                        $asCollection   Should as collection
+     * @param bool                        $toLoad         To load
+     * @return array
      */
-    public function getCategories($parent, $recursionLevel = 0, $sorted = false, $asCollection = false, $toLoad = true)
-    {
+    public function getCategories(
+        Oggetto_News_Model_Category $parent,
+        $recursionLevel = 0, $sorted = false, $asCollection = false, $toLoad = true
+    ) {
         return $this->getResource()->getCategories($parent, $recursionLevel, $sorted, $asCollection, $toLoad);
     }
 
@@ -398,7 +407,7 @@ class Oggetto_News_Model_Category
     }
 
     /**
-     * Retuen children categories of current category
+     * Return children categories of current category
      *
      * @return array
      */
@@ -408,7 +417,7 @@ class Oggetto_News_Model_Category
     }
 
     /**
-     * check if parents are enabled
+     * Check if parents are enabled
      *
      * @return bool
      */
@@ -428,14 +437,14 @@ class Oggetto_News_Model_Category
     }
 
     /**
-     * get default values
+     * Get default values
      *
      * @return array
      */
     public function getDefaultValues()
     {
-        $values = array();
-        $values['status'] = 1;
-        return $values;
+        return [
+            'status' => 1
+        ];
     }
 }

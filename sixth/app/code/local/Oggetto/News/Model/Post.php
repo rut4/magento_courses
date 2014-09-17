@@ -64,6 +64,17 @@ class Oggetto_News_Model_Post extends Mage_Core_Model_Abstract
     }
 
     /**
+     * Get post url by category
+     *
+     * @param Oggetto_News_Model_Category $category Category
+     * @return string
+     */
+    public function getPostUrlByCategory($category)
+    {
+        return $category->getCategoryUrl() . '/' . $this->getUrlKey();
+    }
+
+    /**
      * before save post
      *
      * @return Oggetto_News_Model_Post
@@ -105,7 +116,7 @@ class Oggetto_News_Model_Post extends Mage_Core_Model_Abstract
      *
      * @param string $urlKey Url key
      * @param bool   $active Is active
-     * @return mixed
+     * @return bool
      */
     public function checkUrlKey($urlKey, $active = true)
     {
@@ -113,7 +124,19 @@ class Oggetto_News_Model_Post extends Mage_Core_Model_Abstract
     }
 
     /**
-     * Get the post Text
+     * Check URL path
+     *
+     * @param string $urlPath Url path
+     * @param bool   $active  Is active
+     * @return bool
+     */
+    public function checkUrlPath($urlPath, $active = true)
+    {
+        return $this->_getResource()->checkUrlPath($urlPath, $active);
+    }
+
+    /**
+     * Get the post text
      *
      * @return string
      */

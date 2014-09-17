@@ -30,15 +30,4 @@
  * @author      Ultimate Module Creator
  */
 ?>
-<?php $_category = $this->getCurrentCategory();?>
 <?php echo $this->getMessagesBlock()->getGroupedHtml() ?>
-<div class="page-title category-title">
-    <h1><?php echo $_category->getName(); ?></h1>
-</div>
-<div class="category-view">
-    <div class="category-name">
-        <?php echo Mage::helper('news')->__('Name');?>:<?php echo $_category->getName();?>
-
-    </div>
-
-</div>

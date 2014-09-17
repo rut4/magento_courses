@@ -33,7 +33,7 @@
 <?php $_categories = $this->getCategories(); ?>
 <?php if ($_categories->getSize() > 0) :?>
     <div class="page-title category-title">
-        <h2><?php echo $this->getCurrentCategory()->getName(); ?>:<?php echo $this->__('Children')?></h2>
+        <h2><?php echo $this->getCurrentCategory()->getName(); ?></h2>
     </div>
     <?php if ($this->_getDisplayMode() == 0) : ?>
         <div class="category-list-container">

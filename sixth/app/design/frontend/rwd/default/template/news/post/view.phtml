@@ -36,13 +36,7 @@
     <h1><?php echo $_post->getTitle(); ?></h1>
 </div>
 <div class="post-view">
-    <div class="post-title">
-        <?php echo Mage::helper('news')->__('Title');?>:<?php echo $_post->getTitle();?>
-
-    </div>
     <div class="post-text">
-        <?php echo Mage::helper('news')->__('Text');?>:<?php echo $_post->getText();?>
-
+        <?php echo $_post->getText();?>
     </div>
-
 </div>

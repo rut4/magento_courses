@@ -30,13 +30,12 @@
  * @subpackage Model
  * @author     Eduard Paliy <epaliy@oggettoweb.com>
  */
-class Oggetto_News_Model_Resource_Post
-    extends Mage_Core_Model_Resource_Db_Abstract
+class Oggetto_News_Model_Resource_Post extends Mage_Core_Model_Resource_Db_Abstract
 {
     /**
-     * constructor
+     * Initialization with main table and id field name
      *
-     * @author Ultimate Module Creator
+     * @return void
      */
     public function _construct()
     {
@@ -44,21 +43,39 @@ class Oggetto_News_Model_Resource_Post
     }
 
     /**
-     * check url key
+     * Check url path
      *
-     * @param string $urlKey
-     * @param int $storeId
-     * @param bool $active
+     * @param string $urlPath Url path
+     * @return string
+     */
+    public function checkUrlPath($urlPath)
+    {
+        $select = $this->_initCheckUrlPathSelect($urlPath);
+        $select->join(['p' => $this->getMainTable()], 'p.entity_id = e.post_id', ['p.entity_id']);
+        $select->where('p.status = true');
+
+        $select->reset(Zend_Db_Select::COLUMNS)
+            ->columns('p.entity_id')
+            ->limit(1);
+
+        return $this->_getReadAdapter()->fetchOne($select);
+    }
+
+    /**
+     * Check url key
+     *
+     * @param string $urlKey  Url key
+     * @param int    $storeId Store id
+     * @param bool   $active  Is active
      * @return mixed
-     * @author Ultimate Module Creator
      */
     public function checkUrlKey($urlKey, $storeId, $active = true)
     {
-        $stores = array(Mage_Core_Model_App::ADMIN_STORE_ID, $storeId);
-        $select = $this->_initCheckUrlKeySelect($urlKey, $stores);
+        $select = $this->_initCheckUrlKeySelect($urlKey);
         if ($active) {
             $select->where('e.status = ?', $active);
         }
+
         $select->reset(Zend_Db_Select::COLUMNS)
             ->columns('e.entity_id')
             ->limit(1);
@@ -69,18 +86,12 @@ class Oggetto_News_Model_Resource_Post
     /**
      * Check for unique URL key
      *
-     * @param Mage_Core_Model_Abstract $object
+     * @param Mage_Core_Model_Abstract $object Post
      * @return bool
-     * @author Ultimate Module Creator
      */
     public function getIsUniqueUrlKey(Mage_Core_Model_Abstract $object)
     {
-        if (Mage::app()->isSingleStoreMode() || !$object->hasStores()) {
-            $stores = array(Mage_Core_Model_App::ADMIN_STORE_ID);
-        } else {
-            $stores = (array)$object->getData('stores');
-        }
-        $select = $this->_initCheckUrlKeySelect($object->getData('url_key'), $stores);
+        $select = $this->_initCheckUrlKeySelect($object->getData('url_key'));
         if ($object->getId()) {
             $select->where('e.entity_id <> ?', $object->getId());
         }
@@ -93,9 +104,8 @@ class Oggetto_News_Model_Resource_Post
     /**
      * Check if the URL key is numeric
      *
-     * @param Mage_Core_Model_Abstract $object
+     * @param Mage_Core_Model_Abstract $object Post
      * @return bool
-     * @author Ultimate Module Creator
      */
     protected function isNumericUrlKey(Mage_Core_Model_Abstract $object)
     {
@@ -103,11 +113,10 @@ class Oggetto_News_Model_Resource_Post
     }
 
     /**
-     * Checkif the URL key is valid
+     * Check if the URL key is valid
      *
-     * @param Mage_Core_Model_Abstract $object
+     * @param Mage_Core_Model_Abstract $object Post
      * @return bool
-     * @author Ultimate Module Creator
      */
     protected function isValidUrlKey(Mage_Core_Model_Abstract $object)
     {
@@ -115,11 +124,10 @@ class Oggetto_News_Model_Resource_Post
     }
 
     /**
-     * format string as url key
+     * Format string as url key
      *
-     * @param string $str
+     * @param string $str String as url key
      * @return string
-     * @author Ultimate Module Creator
      */
     public function formatUrlKey($str)
     {
@@ -130,27 +138,24 @@ class Oggetto_News_Model_Resource_Post
     }
 
     /**
-     * init the check select
+     * Init the check select by url path
      *
-     * @param string $urlKey
-     * @param array $store
+     * @param string $urlPath Url path
      * @return Zend_Db_Select
-     * @author Ultimate Module Creator
      */
-    protected function _initCheckUrlKeySelect($urlKey, $store)
+    protected function _initCheckUrlPathSelect($urlPath)
     {
         $select = $this->_getReadAdapter()->select()
-            ->from(array('e' => $this->getMainTable()))
-            ->where('e.url_key = ?', $urlKey);
+            ->from(['e' => $this->getTable('news/category_post')], [])
+            ->where('e.url_path = ?', $urlPath);
         return $select;
     }
 
     /**
-     * validate before saving
+     * Validate before saving
      *
-     * @param $object
+     * @param Mage_Core_Model_Abstract $object Post
      * @return Oggetto_News_Model_Resource_Post
-     * @author Ultimate Module Creator
      */
     protected function _beforeSave(Mage_Core_Model_Abstract $object)
     {
@@ -179,4 +184,44 @@ class Oggetto_News_Model_Resource_Post
         $object->setData('url_key', $urlKey);
         return parent::_beforeSave($object);
     }
+
+    /**
+     * Update url path
+     *
+     * @param Mage_Core_Model_Abstract $post The post which has been saved
+     * @return void
+     */
+    public function updateUrlPath($post)
+    {
+        if ($post->getId()) {
+            foreach ($post->getSelectedCategoriesCollection() as $category) {
+                $urlKey = $category->getUrlPath() . '/' . $post->getUrlKey();
+                $this->_getWriteAdapter()->update(
+                    $this->getTable('news/category_post'),
+                    ['url_path' => $urlKey],
+                    [
+                        'post_id = ?' => $post->getId(),
+                        'category_id = ?' => $category->getId()
+                    ]
+                );
+            }
+        }
+    }
+
+    /**
+     * init the check select
+     *
+     * @param string $urlKey
+     * @param array $store
+     * @return Zend_Db_Select
+     * @author Ultimate Module Creator
+     */
+    protected function _initCheckUrlKeySelect($urlKey)
+    {
+        $select = $this->_getReadAdapter()->select()
+            ->from(['e' => $this->getMainTable()])
+            ->where('e.url_key = ?', $urlKey);
+        return $select;
+    }
+
 }

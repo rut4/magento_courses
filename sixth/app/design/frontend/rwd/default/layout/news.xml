@@ -52,18 +52,22 @@
         <reference name="head">
             <action method="addItem" ifconfig="news/category/tree"><type>skin_js</type><js>js/news/tree.js</js></action>
         </reference>
-        <reference name="content">
+        <reference name="left">
             <block type="news/category_view" name="category_view" template="news/category/view.phtml" />
             <block type="news/category_children" name="category_children" template="news/category/children.phtml" />
+        </reference>
+        <reference name="content">
             <block type="news/category_post_list" name="category.post_list" as="category_categories" template="news/category/post/list.phtml" />
         </reference>
     </news_category_view>
     <news_post_view translate="label" module="news">
         <label>Post view page</label>
         <update handle="page_two_columns_left" />
+        <reference name="left">
+            <block type="news/post_category_list" name="post.category_list" as="post_posts" template="news/post/category/list.phtml" />
+        </reference>
         <reference name="content">
             <block type="news/post_view" name="post_view" template="news/post/view.phtml" />
-            <block type="news/post_category_list" name="post.category_list" as="post_posts" template="news/post/category/list.phtml" />
         </reference>
     </news_post_view>
 </layout>
