@@ -47,24 +47,27 @@ class Oggetto_News_Test_Model_Post extends EcomDev_PHPUnit_Test_Case
      * @return void
      */
     public function testSetsCreateAtDateWhileSavingFirstTime() {
-        ini_set('display_errors', 1);
-        $dateMock = $this->getModelMock('core/date', ['gmtDate']);
         $date = Mage::getModel('core/date')->gmtDate();
+        $dateMock = $this->getModelMock('core/date', ['gmtDate']);
         $dateMock->expects($this->once())
             ->method('gmtDate')
             ->will($this->returnValue($date));
-
         $this->replaceByMock('singleton', 'core/date', $dateMock);
-//        $post = $this->getModelMock('news/post', ['isObjectNew', 'setCreatedAt']);
-//
-//        $post->expects($this->once())
-//            ->method('isObjectNew')
-//            ->will($this->returnValue(true));
-//
-//        $post->expects($this->once())
-//            ->method('setCreatedAt')
-//            ->with($this->equalTo($date));
-//
-//        $post->save();
+
+        $post = $this->getModelMock('news/post', ['isObjectNew', 'setCreatedAt', '_hasModelChanged']);
+
+        $post->expects($this->once())
+            ->method('_hasModelChanged')
+            ->will($this->returnValue(true));
+
+        $post->expects($this->any())
+            ->method('isObjectNew')
+            ->will($this->returnValue(true));
+
+        $post->expects($this->once())
+            ->method('setCreatedAt')
+            ->with($this->equalTo($date));
+
+        $post->save();
     }
 }
