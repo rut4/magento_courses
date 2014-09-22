@@ -1,0 +1,3 @@
+config:
+  stores/default/news/post/prefix: posts
+  stores/default/news/post/suffix: foo

@@ -1,0 +1,3 @@
+config:
+  stores/default/news/post/prefix: null
+  stores/default/news/post/suffix: null

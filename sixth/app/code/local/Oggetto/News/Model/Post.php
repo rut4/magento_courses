@@ -53,7 +53,7 @@ class Oggetto_News_Model_Post extends Mage_Core_Model_Abstract
     protected $_categoryInstance = null;
 
     /**
-     * constructor
+     * Class constructor
      *
      * @return void
      */
@@ -71,11 +71,15 @@ class Oggetto_News_Model_Post extends Mage_Core_Model_Abstract
      */
     public function getPostUrlByCategory($category)
     {
-        return $category->getCategoryUrl() . '/' . $this->getUrlKey();
+        $categoryPrefix = '';
+        if ($categoryUrl = $category->getCategoryUrl()) {
+            $categoryPrefix = $categoryUrl . '/';
+        }
+        return  $categoryPrefix . $this->getPostUrl();
     }
 
     /**
-     * before save post
+     * Before save post
      *
      * @return Oggetto_News_Model_Post
      */
@@ -97,16 +101,11 @@ class Oggetto_News_Model_Post extends Mage_Core_Model_Abstract
      */
     public function getPostUrl()
     {
-        if ($this->getUrlKey()) {
-            $urlKey = '';
-            if ($prefix = Mage::getStoreConfig('news/post/url_prefix')) {
-                $urlKey .= $prefix . '/';
-            }
-            $urlKey .= $this->getUrlKey();
-            if ($suffix = Mage::getStoreConfig('news/post/url_suffix')) {
-                $urlKey .= '.' . $suffix;
-            }
-            return Mage::getUrl('', ['_direct' => $urlKey]);
+        if ($urlKey = $this->getUrlKey()) {
+            $urlKey = $this->_prependPrefix($urlKey);
+            $urlKey = $this->_appendSuffix($urlKey);
+
+            return Mage::getModel('core/url')->getDirectUrl($urlKey);
         }
         return Mage::getUrl('news/post/view', ['id' => $this->getId()]);
     }
@@ -127,12 +126,11 @@ class Oggetto_News_Model_Post extends Mage_Core_Model_Abstract
      * Check URL path
      *
      * @param string $urlPath Url path
-     * @param bool   $active  Is active
      * @return bool
      */
-    public function checkUrlPath($urlPath, $active = true)
+    public function checkUrlPath($urlPath)
     {
-        return $this->_getResource()->checkUrlPath($urlPath, $active);
+        return $this->_getResource()->checkUrlPath($urlPath);
     }
 
     /**
@@ -181,11 +179,9 @@ class Oggetto_News_Model_Post extends Mage_Core_Model_Abstract
     public function getSelectedCategories()
     {
         if (!$this->hasSelectedCategories()) {
-            $categories = [];
-            foreach ($this->getSelectedCategoriesCollection() as $category) {
-                $categories[] = $category;
-            }
-            $this->setSelectedCategories($categories);
+            $this->setSelectedCategories(
+                $this->getSelectedCategoriesCollection()->getItems()
+            );
         }
         return $this->getData('selected_categories');
     }
@@ -197,8 +193,7 @@ class Oggetto_News_Model_Post extends Mage_Core_Model_Abstract
      */
     public function getSelectedCategoriesCollection()
     {
-        $collection = $this->getCategoryInstance()->getCategoriesCollection($this);
-        return $collection;
+        return $this->getCategoryInstance()->getCategoriesCollection($this);
     }
 
     /**
@@ -208,8 +203,36 @@ class Oggetto_News_Model_Post extends Mage_Core_Model_Abstract
      */
     public function getDefaultValues()
     {
-        $values = [];
-        $values['status'] = 1;
-        return $values;
+        return [
+            'status' => 1
+        ];
+    }
+
+    /**
+     * Prepend prefix to url key
+     *
+     * @param string $urlKey url key
+     * @return string
+     */
+    protected function _prependPrefix($urlKey)
+    {
+        if ($prefix = Mage::helper('news/post')->getPrefix()) {
+            $urlKey = $prefix . '/' . $urlKey;
+        }
+        return $urlKey;
+    }
+
+    /**
+     * Append suffix to url key
+     *
+     * @param string $urlKey url key
+     * @return string
+     */
+    protected function _appendSuffix($urlKey)
+    {
+        if ($suffix = Mage::helper('news/post')->getSuffix()) {
+            $urlKey .= '.' . $suffix;
+        }
+        return $urlKey;
     }
 }

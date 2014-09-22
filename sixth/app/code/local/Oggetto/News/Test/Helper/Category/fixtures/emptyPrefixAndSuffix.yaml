@@ -1,0 +1,3 @@
+config:
+  stores/default/news/category/prefix: null
+  stores/default/news/category/suffix: null

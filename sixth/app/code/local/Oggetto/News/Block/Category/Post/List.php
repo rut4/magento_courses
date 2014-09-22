@@ -45,6 +45,12 @@ class Oggetto_News_Block_Category_Post_List extends Oggetto_News_Block_Post_List
         }
     }
 
+    /**
+     * Get post url
+     *
+     * @param Oggetto_News_Model_Post $post Post
+     * @return string
+     */
     public function getPostUrl(Oggetto_News_Model_Post $post)
     {
         return $post->getPostUrlByCategory($this->getCategory());

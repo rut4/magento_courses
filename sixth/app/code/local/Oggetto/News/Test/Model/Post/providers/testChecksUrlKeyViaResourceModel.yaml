@@ -1,0 +1,10 @@
+-
+  - 0
+  - foo.bar
+  - true
+  - 42
+-
+  - 1
+  - baz.qux
+  - false
+  - null

@@ -1,0 +1,3 @@
+config:
+  stores/default/news/category/prefix: news
+  stores/default/news/category/suffix: html

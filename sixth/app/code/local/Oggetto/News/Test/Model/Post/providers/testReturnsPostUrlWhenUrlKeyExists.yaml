@@ -1,0 +1,20 @@
+-
+  - 0
+  - news
+  - html
+  - foo
+-
+  - 1
+  - null
+  - xml
+  - bar
+-
+  - 2
+  - new
+  - null
+  - baz
+-
+  - 3
+  - null
+  - null
+  - qux
