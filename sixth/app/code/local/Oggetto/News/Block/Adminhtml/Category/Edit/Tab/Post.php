@@ -33,9 +33,7 @@
 class Oggetto_News_Block_Adminhtml_Category_Edit_Tab_Post extends Mage_Adminhtml_Block_Widget_Grid
 {
     /**
-     * Set grid params
-     *
-     * @author Ultimate Module Creator
+     * Class constructor
      */
     public function __construct()
     {

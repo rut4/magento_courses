@@ -46,6 +46,16 @@ class Oggetto_News_Helper_Post extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * Get url rewrite for list
+     *
+     * @return string|null
+     */
+    public function getUrlRewriteForList()
+    {
+        return Mage::getStoreConfig('news/post/url_rewrite_list');
+    }
+
+    /**
      * Check if breadcrumbs can be used
      *
      * @return bool
@@ -53,5 +63,29 @@ class Oggetto_News_Helper_Post extends Mage_Core_Helper_Abstract
     public function getUseBreadcrumbs()
     {
         return Mage::getStoreConfigFlag('news/post/breadcrumbs');
+    }
+
+    /**
+     * Get prefix for post
+     *
+     * @return string|null
+     */
+    public function getPrefix()
+    {
+        if ($prefix = Mage::getStoreConfig('news/post/prefix')) {
+            return $prefix . '/';
+        }
+    }
+
+    /**
+     * Get suffix for post
+     *
+     * @return string|null
+     */
+    public function getSuffix()
+    {
+        if ($suffix = Mage::getStoreConfig('news/post/suffix')) {
+            return '.' . $suffix;
+        }
     }
 }

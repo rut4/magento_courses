@@ -53,55 +53,48 @@ class Oggetto_News_Controller_Router extends Mage_Core_Controller_Varien_Router_
      */
     public function match(Zend_Controller_Request_Http $request)
     {
-        if (!Mage::isInstalled()) {
-            Mage::app()->getFrontController()->getResponse()
-                ->setRedirect(Mage::getUrl('install'))
-                ->sendResponse();
-            exit;
-        }
+        $this->_checkInstallation();
         $urlKey = trim($request->getPathInfo(), '/');
         $check = [];
         $check['category'] = new Varien_Object([
-            'prefix' => Mage::getStoreConfig('news/category/url_prefix'),
-            'suffix' => Mage::getStoreConfig('news/category/url_suffix'),
-            'list_key' => Mage::getStoreConfig('news/category/url_rewrite_list'),
+            'prefix'      => Mage::helper('news/category')->getPrefix(),
+            'suffix'      => Mage::helper('news/category')->getSuffix(),
+            'list_key'    => Mage::helper('news/category')->getUrlRewriteForList(),
             'list_action' => 'index',
-            'model' => 'news/category',
-            'controller' => 'category',
-            'action' => 'view',
-            'param' => 'id',
-            'check_path' => 1
+            'model'       => 'news/category',
+            'controller'  => 'category',
+            'action'      => 'view',
+            'param'       => 'id',
+            'check_path'  => 1
         ]);
         $check['post'] = new Varien_Object([
-            'prefix' => Mage::getStoreConfig('news/post/url_prefix'),
-            'suffix' => Mage::getStoreConfig('news/post/url_suffix'),
-            'list_key' => Mage::getStoreConfig('news/post/url_rewrite_list'),
+            'prefix'      => Mage::helper('news/post')->getPrefix(),
+            'suffix'      => Mage::helper('news/post')->getSuffix(),
+            'list_key'    => Mage::helper('news/post')->getUrlRewriteForList(),
             'list_action' => 'index',
-            'model' => 'news/post',
-            'controller' => 'post',
-            'action' => 'view',
-            'param' => 'id',
-            'check_path' => 0
+            'model'       => 'news/post',
+            'controller'  => 'post',
+            'action'      => 'view',
+            'param'       => 'id',
+            'check_path'  => 0
         ]);
         foreach ($check as $key => $settings) {
-            if ($settings->getListKey()) {
-                if ($urlKey == $settings->getListKey()) {
-                    $request->setModuleName('news')
-                        ->setControllerName($settings->getController())
-                        ->setActionName($settings->getListAction());
-                    $request->setAlias(
-                        Mage_Core_Model_Url_Rewrite::REWRITE_REQUEST_PATH_ALIAS,
-                        $urlKey
-                    );
-                    return true;
-                }
+            if ($settings->getListKey() && $urlKey == $settings->getListKey()) {
+                $request->setModuleName('news')
+                    ->setControllerName($settings->getController())
+                    ->setActionName($settings->getListAction());
+                $request->setAlias(
+                    Mage_Core_Model_Url_Rewrite::REWRITE_REQUEST_PATH_ALIAS,
+                    $urlKey
+                );
+                return true;
             }
             if ($settings['prefix']) {
                 $parts = explode('/', $urlKey);
-                if ($parts[0] != $settings['prefix'] || count($parts) != 2) {
+                if ($parts[0] != $settings['prefix']) {
                     continue;
                 }
-                $urlKey = $parts[1];
+                $urlKey = implode('/', array_shift($parts));
             }
             if ($settings['suffix']) {
                 $urlKey = substr($urlKey, 0, -strlen($settings['suffix']) - 1);
@@ -127,5 +120,20 @@ class Oggetto_News_Controller_Router extends Mage_Core_Controller_Varien_Router_
             }
         }
         return false;
+    }
+
+    /**
+     * Check Magento installation
+     *
+     * @return void
+     */
+    protected function _checkInstallation()
+    {
+        if (!Mage::isInstalled()) {
+            Mage::app()->getFrontController()->getResponse()
+                ->setRedirect(Mage::getUrl('install'))
+                ->sendResponse();
+            exit;
+        }
     }
 }

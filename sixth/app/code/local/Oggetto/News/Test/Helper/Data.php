@@ -23,13 +23,23 @@
  */
 
 /**
- * News default helper
+ * Data helper test
  *
  * @category   Oggetto
  * @package    Oggetto_News
- * @subpackage Helper
+ * @subpackage Test
  * @author     Eduard Paliy <epaliy@oggettoweb.com>
  */
-class Oggetto_News_Helper_Data extends Mage_Core_Helper_Abstract
+class Oggetto_News_Test_Helper_Data extends EcomDev_PHPUnit_Test_Case
 {
+    /**
+     * Test is available via alias
+     *
+     * @return void
+     */
+    public function testIsAvailableViaAlias()
+    {
+        $this->assertInstanceOf('Oggetto_News_Helper_Data', Mage::helper('news'));
+        $this->assertInstanceOf('Oggetto_News_Helper_Data', Mage::helper('news/data'));
+    }
 }

@@ -51,10 +51,20 @@ class Oggetto_News_Helper_Category extends Mage_Core_Helper_Abstract
      */
     public function getCategoriesUrl()
     {
-        if ($listKey = Mage::getStoreConfig('news/category/url_rewrite_list')) {
-            return Mage::getUrl('', array('_direct' => $listKey));
+        if ($listKey = $this->getUrlRewriteForList()) {
+            return Mage::getModel('core/url')->getDirectUrl($listKey);
         }
         return Mage::getUrl('news/category/index');
+    }
+
+    /**
+     * Get url rewrite for list
+     *
+     * @return string|null
+     */
+    public function getUrlRewriteForList()
+    {
+         return Mage::getStoreConfig('news/category/url_rewrite_list');
     }
 
     /**
@@ -65,5 +75,29 @@ class Oggetto_News_Helper_Category extends Mage_Core_Helper_Abstract
     public function getUseBreadcrumbs()
     {
         return Mage::getStoreConfigFlag('news/category/breadcrumbs');
+    }
+
+    /**
+     * Get prefix for category
+     *
+     * @return string|null
+     */
+    public function getPrefix()
+    {
+        if ($prefix = Mage::getStoreConfig('news/category/prefix')) {
+            return $prefix . '/';
+        }
+    }
+
+    /**
+     * Get suffix for category
+     *
+     * @return string|null
+     */
+    public function getSuffix()
+    {
+        if ($suffix = Mage::getStoreConfig('news/category/suffix')) {
+            return '.' . $suffix;
+        }
     }
 }

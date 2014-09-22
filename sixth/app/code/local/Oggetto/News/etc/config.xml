@@ -156,4 +156,11 @@
             </post>
         </news>
     </default>
+    <phpunit>
+        <suite>
+            <modules>
+                <Oggetto_News />
+            </modules>
+        </suite>
+    </phpunit>
 </config>
