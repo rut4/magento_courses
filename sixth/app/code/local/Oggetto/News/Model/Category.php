@@ -86,10 +86,10 @@ class Oggetto_News_Model_Category extends Mage_Core_Model_Abstract
      */
     public function getCategoryUrl()
     {
-        if ($this->getUrlPath()) {
-            return Mage::getUrl('', array('_direct' => $this->getUrlPath()));
+        if ($urlPath = $this->getUrlPath()) {
+            return Mage::getModel('core/url')->getDirectUrl($urlPath);
         }
-        return Mage::getUrl('news/category/view', array('id' => $this->getId()));
+        return Mage::getUrl('news/category/view', ['id' => $this->getId()]);
     }
 
     /**
@@ -149,11 +149,9 @@ class Oggetto_News_Model_Category extends Mage_Core_Model_Abstract
     public function getSelectedPosts()
     {
         if (!$this->hasSelectedPosts()) {
-            $posts = array();
-            foreach ($this->getSelectedPostsCollection() as $post) {
-                $posts[] = $post;
-            }
-            $this->setSelectedPosts($posts);
+            $this->setSelectedPosts(
+                array_values($this->getSelectedPostsCollection()->getItems())
+            );
         }
         return $this->getData('selected_posts');
     }
@@ -165,8 +163,7 @@ class Oggetto_News_Model_Category extends Mage_Core_Model_Abstract
      */
     public function getSelectedPostsCollection()
     {
-        $collection = $this->getPostInstance()->getPostsCollection($this);
-        return $collection;
+        return $this->getPostInstance()->getPostsCollection($this);
     }
 
     /**
@@ -203,6 +200,39 @@ class Oggetto_News_Model_Category extends Mage_Core_Model_Abstract
     public function move($parentId, $afterCategoryId)
     {
         $parent = Mage::getModel('news/category')->load($parentId);
+        $this->_checkCategoryIds($parent);
+        $this->setMovedCategoryId($this->getId());
+        /** @var Oggetto_News_Model_Resource_Category $resource */
+        $resource = $this->_getResource()->beginTransaction();
+        try {
+            $resource
+                ->changeParent($this, $parent, $afterCategoryId)
+                ->commit();
+            $this->setAffectedCategoryIds([$this->getId(), $this->getParentId(), $parentId]);
+            $resource->updateUrlPath($this);
+
+            $this->_moveChildCategories();
+            $moveComplete = true;
+        } catch (Exception $e) {
+            $resource->rollBack();
+            $moveComplete = false;
+            throw $e;
+        }
+        if ($moveComplete) {
+            Mage::app()->cleanCache([self::CACHE_TAG]);
+        }
+        return $this;
+    }
+
+    /**
+     * Check category and its parent ids for moving
+     *
+     * @param Oggetto_News_Model_Category $parent Category parent
+     * @throws Mage_Core_Exception
+     * @return void
+     */
+    protected function _checkCategoryIds($parent)
+    {
         if (!$parent->getId()) {
             Mage::throwException(
                 Mage::helper('news')
@@ -219,54 +249,33 @@ class Oggetto_News_Model_Category extends Mage_Core_Model_Abstract
                     ->__('Category move operation is not possible: parent category is equal to child category.')
             );
         }
-        $this->setMovedCategoryId($this->getId());
-        $eventParams = array(
-            $this->_eventObject => $this,
-            'parent' => $parent,
-            'category_id' => $this->getId(),
-            'prev_parent_id' => $this->getParentId(),
-            'parent_id' => $parentId
-        );
-        $moveComplete = false;
-        $this->_getResource()->beginTransaction();
-        try {
-            $this->getResource()->changeParent($this, $parent, $afterCategoryId);
-            $this->_getResource()->commit();
-            $this->setAffectedCategoryIds(array($this->getId(), $this->getParentId(), $parentId));
-            $this->getResource()->updateUrlPath($this);
-            $moveComplete = true;
-        } catch (Exception $e) {
-            $this->_getResource()->rollBack();
-            throw $e;
+    }
+
+    /**
+     * Move child categories after moving
+     *
+     * @return void
+     */
+    protected function _moveChildCategories()
+    {
+        $afterId = 0;
+        foreach ($this->getChildrenCategories() as $children) {
+            $children->move($this->getId(), $afterId);
+            $afterId = $children->getId();
         }
-        if ($moveComplete) {
-            Mage::app()->cleanCache(array(self::CACHE_TAG));
-        }
-        return $this;
     }
 
     /**
      * Get the parent category
      *
-     * @return  Oggetto_News_Model_Category
+     * @return Oggetto_News_Model_Category
      */
     public function getParentCategory()
     {
-        if (!$this->hasData('parent_category')) {
+        if (!$this->hasParentCategory()) {
             $this->setData('parent_category', Mage::getModel('news/category')->load($this->getParentId()));
         }
         return $this->_getData('parent_category');
-    }
-
-    /**
-     * Get the parent id
-     *
-     * @return  int
-     */
-    public function getParentId()
-    {
-        $parentIds = $this->getParentIds();
-        return intval(array_pop($parentIds));
     }
 
     /**
@@ -276,7 +285,7 @@ class Oggetto_News_Model_Category extends Mage_Core_Model_Abstract
      */
     public function getParentIds()
     {
-        return array_diff($this->getPathIds(), array($this->getId()));
+        return array_diff($this->getPathIds(), [$this->getId()]);
     }
 
     /**
@@ -323,12 +332,10 @@ class Oggetto_News_Model_Category extends Mage_Core_Model_Abstract
      */
     public function getPathIds()
     {
-        $ids = $this->getData('path_ids');
-        if (is_null($ids)) {
-            $ids = explode('/', $this->getPath());
-            $this->setData('path_ids', $ids);
+        if (!$this->hasPathIds()) {
+            $this->setPathIds(explode('/', $this->getPath()));
         }
-        return $ids;
+        return $this->getData('path_ids');
     }
 
     /**
@@ -339,9 +346,19 @@ class Oggetto_News_Model_Category extends Mage_Core_Model_Abstract
     public function getLevel()
     {
         if (!$this->hasLevel()) {
-            return count(explode('/', $this->getPath())) - 1;
+            return $this->_getLevelFromPath();
         }
         return $this->getData('level');
+    }
+
+    /**
+     * Get level from category path
+     *
+     * @return int
+     */
+    protected function _getLevelFromPath()
+    {
+        return count(explode('/', $this->getPath())) - 1;
     }
 
     /**
@@ -353,16 +370,6 @@ class Oggetto_News_Model_Category extends Mage_Core_Model_Abstract
     public function verifyIds(array $ids)
     {
         return $this->getResource()->verifyIds($ids);
-    }
-
-    /**
-     * check if category has children
-     *
-     * @return bool
-     */
-    public function hasChildren()
-    {
-        return $this->_getResource()->getChildrenAmount($this) > 0;
     }
 
     /**
@@ -425,10 +432,7 @@ class Oggetto_News_Model_Category extends Mage_Core_Model_Abstract
         $parents = $this->getParentCategories();
         $rootId = Mage::helper('news/category')->getRootCategoryId();
         foreach ($parents as $parent) {
-            if ($parent->getId() == $rootId) {
-                continue;
-            }
-            if (!$parent->getStatus()) {
+            if (!$parent->getStatus() && $parent->getId() != $rootId) {
                 return false;
             }
         }

@@ -54,33 +54,12 @@ class Oggetto_News_Test_Controller_Router extends EcomDev_PHPUnit_Test_Case
 
         $this->replaceByMock('helper', 'news/post', $postHelper);
 
-        $request = $this->getMock('Zend_Controller_Request_Http');
+        $request = $this->_prepareCategoryRequest($path, $urlKey);
 
         $request->expects($this->once())
-        ->method('getPathInfo')
-        ->will($this->returnValue($path));
-
-        $request->expects($this->once())
-        ->method('setModuleName')
-        ->with($this->equalTo('news'))
-        ->will($this->returnSelf());
-
-        $request->expects($this->once())
-        ->method('setControllerName')
-        ->with($this->equalTo('category'))
-        ->will($this->returnSelf());
-
-        $request->expects($this->once())
-        ->method('setActionName')
-        ->with($this->equalTo('index'))
-        ->will($this->returnSelf());
-
-        $request->expects($this->once())
-        ->method('setAlias')
-        ->with(
-            $this->equalTo(Mage_Core_Model_Url_Rewrite::REWRITE_REQUEST_PATH_ALIAS),
-            $urlKey
-        );
+            ->method('setActionName')
+            ->with($this->equalTo('index'))
+            ->will($this->returnSelf());
 
         $router = new Oggetto_News_Controller_Router;
 
@@ -90,20 +69,117 @@ class Oggetto_News_Test_Controller_Router extends EcomDev_PHPUnit_Test_Case
     /**
      * Test matches url rewrite for category list
      *
-     * @param string $path   Path info
-     * @param string $urlKey Url
+     * @param string $path            Path info
+     * @param string $urlKey          Url key
+     * @param string $prefix          Prefix
+     * @param string $suffix          Suffix
+     * @param int    $keyCheckResult  Id by key
+     * @param int    $pathCheckResult Id by path
+     * @param int    $id              Category id
      * @dataProvider dataProvider
      * @return void
      */
-    public function testMatchesCategoryUrl($path, $urlKey)
+    public function testMatchesCategoryUrl($path, $urlKey, $prefix, $suffix, $keyCheckResult, $pathCheckResult, $id)
     {
-        $this->markTestIncomplete();
+        $categoryHelper = $this->getHelperMock('news/category', ['getPrefix', 'getSuffix', 'getUrlRewriteForList']);
+
+        $categoryHelper->expects($this->once())
+            ->method('getPrefix')
+            ->will($this->returnValue($prefix));
+
+        $categoryHelper->expects($this->once())
+            ->method('getSuffix')
+            ->will($this->returnValue($suffix));
+
+        $this->replaceByMock('helper', 'news/category', $categoryHelper);
+        $this->replaceByMock('helper', 'news/post', $this->getHelperMock('news/post'));
+
+        $request = $this->_prepareCategoryRequest($path, $urlKey);
+
+        $request->expects($this->once())
+            ->method('setActionName')
+            ->with($this->equalTo('view'))
+            ->will($this->returnSelf());
+
+        $request->expects($this->once())
+            ->method('setParam')
+            ->with($this->equalTo('id'), $this->equalTo($id));
+
+        $category = $this->getModelMock('news/category', ['checkUrlPath', 'checkUrlKey', 'load', 'getStatusPath']);
+
+        $category->expects($this->once())
+            ->method('checkUrlPath')
+            ->with($this->equalTo($urlKey))
+            ->will($this->returnValue($pathCheckResult));
+
+        $category->expects($this->any())
+            ->method('checkUrlKey')
+            ->with($this->equalTo($urlKey))
+            ->will($this->returnValue($keyCheckResult));
+
+        $category->expects($this->once())
+            ->method('load')
+            ->with($this->equalTo($id))
+            ->will($this->returnSelf());
+
+        $category->expects($this->once())
+            ->method('getStatusPath')
+            ->will($this->returnValue(true));
+
+        $this->replaceByMock('model', 'news/category', $category);
+
+        $router = new Oggetto_News_Controller_Router;
+
+        $this->assertTrue($router->match($request));
+    }
+
+    /**
+     * Test matches url rewrite for category list
+     *
+     * @return void
+     */
+    public function testDoesNotMatchCategoryUrlWhenItsWrong()
+    {
         $this->replaceByMock('helper', 'news/category', $this->getHelperMock('news/category'));
         $this->replaceByMock('helper', 'news/post', $this->getHelperMock('news/post'));
 
         $request = $this->getMock('Zend_Controller_Request_Http');
 
-        $request->expects($this->once())
+        $request->expects($this->any())
+            ->method('getPathInfo')
+            ->will($this->returnValue('/foo'));
+
+        $category = $this->getModelMock('news/category', ['checkUrlPath', 'checkUrlKey']);
+
+        $category->expects($this->once())
+            ->method('checkUrlPath')
+            ->with($this->equalTo('foo'))
+            ->will($this->returnValue(false));
+
+        $category->expects($this->any())
+            ->method('checkUrlKey')
+            ->with($this->equalTo('foo'))
+            ->will($this->returnValue(false));
+
+        $this->replaceByMock('model', 'news/category', $category);
+
+        $router = new Oggetto_News_Controller_Router;
+
+        $this->assertFalse($router->match($request));
+    }
+
+    /**
+     * Prepare category request mock
+     *
+     * @param string $path   Path
+     * @param string $urlKey Url key
+     * @return PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function _prepareCategoryRequest($path, $urlKey)
+    {
+        $request = $this->getMock('Zend_Controller_Request_Http');
+
+        $request->expects($this->any())
             ->method('getPathInfo')
             ->will($this->returnValue($path));
 
@@ -118,8 +194,37 @@ class Oggetto_News_Test_Controller_Router extends EcomDev_PHPUnit_Test_Case
             ->will($this->returnSelf());
 
         $request->expects($this->once())
-            ->method('setActionName')
-            ->with($this->equalTo('index'))
+            ->method('setAlias')
+            ->with(
+                $this->equalTo(Mage_Core_Model_Url_Rewrite::REWRITE_REQUEST_PATH_ALIAS),
+                $urlKey
+            );
+        return $request;
+    }
+
+    /**
+     * Prepare category request mock
+     *
+     * @param string $path   Path
+     * @param string $urlKey Url key
+     * @return PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function _preparePostRequest($path, $urlKey)
+    {
+        $request = $this->getMock('Zend_Controller_Request_Http');
+
+        $request->expects($this->any())
+            ->method('getPathInfo')
+            ->will($this->returnValue($path));
+
+        $request->expects($this->once())
+            ->method('setModuleName')
+            ->with($this->equalTo('news'))
+            ->will($this->returnSelf());
+
+        $request->expects($this->once())
+            ->method('setControllerName')
+            ->with($this->equalTo('post'))
             ->will($this->returnSelf());
 
         $request->expects($this->once())
@@ -128,10 +233,67 @@ class Oggetto_News_Test_Controller_Router extends EcomDev_PHPUnit_Test_Case
                 $this->equalTo(Mage_Core_Model_Url_Rewrite::REWRITE_REQUEST_PATH_ALIAS),
                 $urlKey
             );
+        return $request;
+    }
+
+    /**
+     * Test matches url rewrite for category list
+     *
+     * @param string $path            Path info
+     * @param string $urlKey          Url key
+     * @param string $prefix          Prefix
+     * @param string $suffix          Suffix
+     * @param int    $keyCheckResult  Id by key
+     * @param int    $pathCheckResult Id by path
+     * @param int    $id              Category id
+     * @dataProvider dataProvider
+     * @return void
+     */
+    public function testMatchesPostUrl($path, $urlKey, $prefix, $suffix, $keyCheckResult, $pathCheckResult, $id)
+    {
+        $this->replaceByMock('helper', 'news/category', $this->getHelperMock('news/category'));
+
+        $postHelper = $this->getHelperMock('news/post', ['getPrefix', 'getSuffix', 'getUrlRewriteForList']);
+
+        $postHelper->expects($this->once())
+            ->method('getPrefix')
+            ->will($this->returnValue($prefix));
+
+        $postHelper->expects($this->once())
+            ->method('getSuffix')
+            ->will($this->returnValue($suffix));
+
+        $this->replaceByMock('helper', 'news/post', $postHelper);
+
+        $request = $this->_preparePostRequest($path, $urlKey);
+
+        $request->expects($this->once())
+            ->method('setActionName')
+            ->with($this->equalTo('view'))
+            ->will($this->returnSelf());
+
+        $request->expects($this->once())
+            ->method('setParam')
+            ->with($this->equalTo('id'), $this->equalTo($id));
+
+        $post = $this->getModelMock('news/post', ['checkUrlPath', 'checkUrlKey']);
+
+        $post->expects($this->once())
+            ->method('checkUrlPath')
+            ->with($this->equalTo($urlKey))
+            ->will($this->returnValue($pathCheckResult));
+
+        $post->expects($this->any())
+            ->method('checkUrlKey')
+            ->with($this->equalTo($urlKey))
+            ->will($this->returnValue($keyCheckResult));
+
+        $this->replaceByMock('model', 'news/post', $post);
 
         $router = new Oggetto_News_Controller_Router;
 
         $this->assertTrue($router->match($request));
     }
+
 
 }

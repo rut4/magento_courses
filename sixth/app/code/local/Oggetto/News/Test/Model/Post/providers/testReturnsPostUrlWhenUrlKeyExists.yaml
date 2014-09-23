@@ -3,18 +3,22 @@
   - news
   - html
   - foo
+  - news/foo.html
 -
   - 1
   - null
   - xml
   - bar
+  - bar.xml
 -
   - 2
   - new
   - null
   - baz
+  - new/baz
 -
   - 3
   - null
   - null
+  - qux
   - qux

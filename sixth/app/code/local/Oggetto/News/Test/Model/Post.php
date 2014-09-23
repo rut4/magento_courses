@@ -176,7 +176,7 @@ class Oggetto_News_Test_Model_Post extends EcomDev_PHPUnit_Test_Case
      * @loadExpectation
      * @return void
      */
-    public function testReturnsPostUrlWhenUrlKeyExists($callNumber, $prefix, $suffix, $urlKey)
+    public function testReturnsPostUrlWhenUrlKeyExists($callNumber, $prefix, $suffix, $urlKey, $postUrl)
     {
         $post = $this->getModelMock('news/post', ['getUrlKey']);
 
@@ -200,11 +200,12 @@ class Oggetto_News_Test_Model_Post extends EcomDev_PHPUnit_Test_Case
 
         $url->expects($this->once())
             ->method('getDirectUrl')
-            ->with($this->equalTo($this->expected($callNumber)->getPostUrl()));
+            ->with($this->equalTo($postUrl))
+            ->will($this->returnValue($postUrl));
 
         $this->replaceByMock('model', 'core/url', $url);
 
-        $post->getPostUrl();
+        $this->assertEquals($this->expected($callNumber)->getPostUrl(), $post->getPostUrl());
     }
 
     /**

@@ -1,0 +1,10 @@
+-
+  - 0
+  - cat1/cat2/new/foo.bar
+  - true
+  - 42
+-
+  - 1
+  - baz.qux
+  - false
+  - null
