@@ -120,7 +120,8 @@
                 var parent = tree.getNodeById(tree.addNodeTo);
                 tree.addNodeTo = false;
                 if (parent) {
-                    var node = new Ext.tree.AsyncTreeNode(editingCategoryBreadcrumbs[editingCategoryBreadcrumbs.length - 1]);
+                    var node =
+                        new Ext.tree.AsyncTreeNode(editingCategoryBreadcrumbs[editingCategoryBreadcrumbs.length - 1]);
                     node.loaded = true;
                     tree.currentNodeId = node.id;
                     parent.appendChild(node);

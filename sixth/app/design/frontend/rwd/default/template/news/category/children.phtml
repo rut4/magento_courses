@@ -27,32 +27,33 @@
  *
  * @category    Oggetto
  * @package     Oggetto_News
- * @author      Ultimate Module Creator
+ * @author      Eduard Paliy <epaliy@oggettoweb.com>
  */
 ?>
-<?php $_categories = $this->getCategories(); ?>
-<?php if ($_categories->getSize() > 0) :?>
+<?php $categories = $this->getCategories(); ?>
+<?php if ($categories->getSize() > 0): ?>
     <div class="page-title category-title">
         <h2><?php echo $this->getCurrentCategory()->getName(); ?></h2>
     </div>
-    <?php if ($this->_getDisplayMode() == 0) : ?>
+    <?php if ($this->_getDisplayMode() == 0): ?>
         <div class="category-list-container">
-            <?php foreach ($_categories as $_category) : ?>
+            <?php foreach ($categories as $category): ?>
                 <div class="category-list-item">
-                    <a href="<?php echo $_category->getCategoryUrl();?>" title="<?php echo $this->htmlEscape($_category->getName()) ?>">
-                        <?php echo $_category->getName(); ?>
+                    <a href="<?php echo $category->getCategoryUrl(); ?>"
+                       title="<?php echo $this->htmlEscape($category->getName()) ?>">
+                        <?php echo $category->getName(); ?>
                     </a>
                 </div>
-            <?php endforeach;?>
+            <?php endforeach; ?>
         </div>
     <?php else : ?>
         <ul id="categories-list">
-            <?php foreach ($_categories as $_category) : ?>
-                <?php echo $this->drawCategory($_category);?>
-            <?php endforeach;?>
+            <?php foreach ($categories as $category) : ?>
+                <?php echo $this->drawCategory($category); ?>
+            <?php endforeach; ?>
         </ul>
         <script type="text/javascript">
             newsTree('categories-list');
         </script>
-    <?php endif;?>
-<?php endif;?>
+    <?php endif; ?>
+<?php endif; ?>

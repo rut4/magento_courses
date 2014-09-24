@@ -27,37 +27,37 @@
  *
  * @category    Oggetto
  * @package     Oggetto_News
- * @author      Ultimate Module Creator
+ * @author      Eduard Paliy <epaliy@oggettoweb.com>
  */
 ?>
 <?php echo $this->getMessagesBlock()->getGroupedHtml() ?>
-<?php $_categories = $this->getCategories(); ?>
+<?php $categories = $this->getCategories(); ?>
 <div class="page-title category-title">
     <h1><?php echo Mage::helper('news')->__('Categories') ?></h1>
 </div>
-<?php if ($_categories->getSize() > 0) :?>
+<?php if ($categories->getSize() > 0) : ?>
     <?php if ($this->_getDisplayMode() == 0) : ?>
         <?php echo $this->getPagerHtml(); ?>
         <div class="category-list-container">
-            <?php foreach ($_categories as $_category) : ?>
+            <?php foreach ($categories as $_category) : ?>
                 <div class="category-list-item">
-            <a href="<?php echo $_category->getCategoryUrl()?>">
-                <?php echo $_category->getName();?>
-            </a><br />
+                    <a href="<?php echo $_category->getCategoryUrl() ?>">
+                        <?php echo $_category->getName(); ?>
+                    </a><br/>
                 </div>
-            <?php endforeach;?>
+            <?php endforeach; ?>
         </div>
         <?php echo $this->getPagerHtml(); ?>
     <?php else : ?>
         <ul id="categories-list">
-            <?php foreach ($_categories as $_category) : ?>
-                <?php echo $this->drawCategory($_category);?>
-            <?php endforeach;?>
+            <?php foreach ($categories as $_category) : ?>
+                <?php echo $this->drawCategory($_category); ?>
+            <?php endforeach; ?>
         </ul>
         <script type="text/javascript">
             newsTree('categories-list');
         </script>
-    <?php endif;?>
+    <?php endif; ?>
 <?php else : ?>
-    <?php echo Mage::helper('news')->__('There are no categories at this moment');?>
-<?php endif;?>
+    <?php echo Mage::helper('news')->__('There are no categories at this moment'); ?>
+<?php endif; ?>

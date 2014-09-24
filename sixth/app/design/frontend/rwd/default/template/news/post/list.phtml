@@ -23,22 +23,22 @@
  */
 ?>
 <?php echo $this->getMessagesBlock()->getGroupedHtml() ?>
-<?php $_posts = $this->getPosts(); ?>
+<?php $posts = $this->getPosts(); ?>
 <div class="page-title post-title">
     <h1><?php echo Mage::helper('news')->__('Posts') ?></h1>
 </div>
-<?php if ($_posts->getSize() > 0) :?>
+<?php if ($posts->getSize() > 0): ?>
     <?php echo $this->getPagerHtml(); ?>
     <div class="post-list-container">
-    <?php foreach ($_posts as $_post) : ?>
-        <div class="post-list-item">
-            <a href="<?php echo $_post->getPostUrl()?>">
-                <?php echo $_post->getTitle();?>
-            </a><br />
-        </div>
-    <?php endforeach;?>
+        <?php foreach ($posts as $post): ?>
+            <div class="post-list-item">
+                <a href="<?php echo $post->getPostUrl() ?>">
+                    <?php echo $post->getTitle(); ?>
+                </a>
+            </div>
+        <?php endforeach; ?>
     </div>
     <?php echo $this->getPagerHtml(); ?>
-<?php else : ?>
-    <?php echo Mage::helper('news')->__('There are no posts at this moment');?>
-<?php endif;?>
+<?php else: ?>
+    <?php echo Mage::helper('news')->__('There are no posts at this moment'); ?>
+<?php endif; ?>
