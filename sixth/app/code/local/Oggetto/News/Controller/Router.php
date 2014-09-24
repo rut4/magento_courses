@@ -76,7 +76,6 @@ class Oggetto_News_Controller_Router extends Mage_Core_Controller_Varien_Router_
             'param'       => 'id',
             'check_path'  => 0
         ]);
-        
         return $this->_checkSettings($category, $request) || $this->_checkSettings($post, $request);
     }
 
@@ -115,23 +114,13 @@ class Oggetto_News_Controller_Router extends Mage_Core_Controller_Varien_Router_
             );
             return true;
         }
-        if ($settings['prefix']) {
-            $parts = explode('/', $urlKey);
-            if ($parts[0] != $settings['prefix']) {
-                return false;
-            }
-            array_shift($parts);
-            $urlKey = implode('/', $parts);
+        $urlKey = $this->_removePrefix($settings['prefix'], $urlKey);
+        if (!$urlKey) {
+            return false;
         }
-        if ($settings['suffix']) {
-            $urlKey = substr($urlKey, 0, -strlen($settings['suffix']) - 1);
-        }
+        $urlKey = $this->_removeSuffix($settings['suffix'], $urlKey);
         $model = Mage::getModel($settings->getModel());
-        $id = $model->checkUrlPath($urlKey);
-        if (!$id) {
-            $id = $model->checkUrlKey($urlKey);
-        }
-        if ($id) {
+        if (($id = $model->checkUrlPath($urlKey)) || ($id = $model->checkUrlKey($urlKey))) {
             if ($settings->getCheckPath() && !$model->load($id)->getStatusPath()) {
                 return false;
             }
@@ -146,5 +135,40 @@ class Oggetto_News_Controller_Router extends Mage_Core_Controller_Varien_Router_
             return true;
         }
         return false;
+    }
+
+    /**
+     * Remove suffix from url
+     *
+     * @param string $suffix Suffix
+     * @param string $urlKey Url key
+     * @return string
+     */
+    protected function _removeSuffix($suffix, $urlKey)
+    {
+        if ($suffix) {
+            $urlKey = substr($urlKey, 0, -strlen($suffix) - 1);
+        }
+        return $urlKey;
+    }
+
+    /**
+     * Remove prefix from url
+     *
+     * @param string $prefix Prefix
+     * @param string $urlKey Url key
+     * @return string
+     */
+    protected function _removePrefix($prefix, $urlKey)
+    {
+        if ($prefix) {
+            $parts = explode('/', $urlKey);
+            if ($parts[0] != $prefix) {
+                return false;
+            }
+            array_shift($parts);
+            $urlKey = implode('/', $parts);
+        }
+        return $urlKey;
     }
 }
