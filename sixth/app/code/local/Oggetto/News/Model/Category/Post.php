@@ -65,8 +65,7 @@ class Oggetto_News_Model_Category_Post extends Mage_Core_Model_Abstract
      */
     public function getPostsCollection($category)
     {
-        $collection = Mage::getResourceModel('news/category_post_collection')
+        return Mage::getResourceModel('news/category_post_collection')
             ->addCategoryFilter($category);
-        return $collection;
     }
 }

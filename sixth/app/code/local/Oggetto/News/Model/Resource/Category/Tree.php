@@ -59,12 +59,12 @@ class Oggetto_News_Model_Resource_Category_Tree extends Varien_Data_Tree_Dbp
         parent::__construct(
             $resource->getConnection('news_write'),
             $resource->getTableName('news/category'),
-            array(
+            [
                 Varien_Data_Tree_Dbp::ID_FIELD => 'entity_id',
                 Varien_Data_Tree_Dbp::PATH_FIELD => 'path',
                 Varien_Data_Tree_Dbp::ORDER_FIELD => 'position',
                 Varien_Data_Tree_Dbp::LEVEL_FIELD => 'level',
-            )
+            ]
         );
     }
 
@@ -141,7 +141,7 @@ class Oggetto_News_Model_Resource_Category_Tree extends Varien_Data_Tree_Dbp
      */
     protected function _afterMove($category, $newParent, $prevNode)
     {
-        Mage::app()->cleanCache(array(Oggetto_News_Model_Category::CACHE_TAG));
+        Mage::app()->cleanCache([Oggetto_News_Model_Category::CACHE_TAG]);
         return $this;
     }
 
@@ -157,6 +157,38 @@ class Oggetto_News_Model_Resource_Category_Tree extends Varien_Data_Tree_Dbp
         $levelField = $this->_conn->quoteIdentifier('level');
         $pathField = $this->_conn->quoteIdentifier('path');
         // load first two levels, if no ids specified
+        $ids = $this->_prepareIds($ids, $levelField);
+        $where = [];
+        // collect paths of specified IDs and prepare to collect all their parents and neighbours
+        $select = $this->_conn->select()
+            ->from($this->_table, ['path', 'level'])
+            ->where('entity_id IN (?)', $ids);
+        $where[] = $levelField . '=0';
+
+        foreach ($this->_conn->fetchAll($select) as $item) {
+            $where = array_merge($where, $this->_getConditionsForNode($item, $levelField, $pathField));
+        }
+
+        $select = $this->_getAllRequiredRecords($addCollectionData, $where);
+
+        // get array of records and add them as nodes to the tree
+        $arrNodes = $this->_conn->fetchAll($select);
+        if (!$arrNodes) {
+            return false;
+        }
+        $this->addChildNodes($this->_getChildItems($arrNodes), '', null);
+        return $this;
+    }
+
+    /**
+     * Prepare ids to select
+     *
+     * @param array|string $ids        Ids
+     * @param int          $levelField Node level
+     * @return array
+     */
+    protected function _prepareIds($ids, $levelField)
+    {
         if (empty($ids)) {
             $select = $this->_conn->select()
                 ->from($this->_table, 'entity_id')
@@ -164,31 +196,46 @@ class Oggetto_News_Model_Resource_Category_Tree extends Varien_Data_Tree_Dbp
             $ids = $this->_conn->fetchCol($select);
         }
         if (!is_array($ids)) {
-            $ids = array($ids);
+            $ids = [$ids];
         }
         foreach ($ids as $key => $id) {
             $ids[$key] = (int)$id;
         }
-        // collect paths of specified IDs and prepare to collect all their parents and neighbours
-        $select = $this->_conn->select()
-            ->from($this->_table, array('path', 'level'))
-            ->where('entity_id IN (?)', $ids);
-        $where = array($levelField . '=0' => true);
+        return $ids;
+    }
 
-        foreach ($this->_conn->fetchAll($select) as $item) {
-            $pathIds = explode('/', $item['path']);
-            $level = (int)$item['level'];
-            while ($level > 0) {
-                $pathIds[count($pathIds) - 1] = '%';
-                $path = implode('/', $pathIds);
-                $where["$levelField=$level AND $pathField LIKE '$path'"] = true;
-                array_pop($pathIds);
-                $level--;
-            }
+    /**
+     * Get conditions for node
+     *
+     * @param array  $item       Node
+     * @param string $levelField Level field
+     * @param string $pathField  Path field
+     * @return array
+     */
+    protected function _getConditionsForNode(array $item, $levelField, $pathField)
+    {
+        $where = [];
+        $pathIds = explode('/', $item['path']);
+        $level = (int)$item['level'];
+        while ($level > 0) {
+            $pathIds[count($pathIds) - 1] = '%';
+            $path = implode('/', $pathIds);
+            $where[] = "$levelField=$level AND $pathField LIKE '$path'";
+            array_pop($pathIds);
+            $level--;
         }
-        $where = array_keys($where);
+        return $where;
+    }
 
-        // get all required records
+    /**
+     * Get all required records
+     *
+     * @param bool  $addCollectionData Should add collection data
+     * @param array $where             Where conditions
+     * @return Zend_Db_Select
+     */
+    protected function _getAllRequiredRecords($addCollectionData, array $where)
+    {
         if ($addCollectionData) {
             $select = $this->_createCollectionDataSelect();
         } else {
@@ -196,21 +243,25 @@ class Oggetto_News_Model_Resource_Category_Tree extends Varien_Data_Tree_Dbp
             $select->order($this->_orderField . ' ' . Varien_Db_Select::SQL_ASC);
         }
         $select->where(implode(' OR ', $where));
+        return $select;
+    }
 
-        // get array of records and add them as nodes to the tree
-        $arrNodes = $this->_conn->fetchAll($select);
-        if (!$arrNodes) {
-            return false;
-        }
-        $childrenItems = array();
+    /**
+     * Get child items for nodes
+     *
+     * @param array $arrNodes Nodes
+     * @return array
+     */
+    protected function _getChildItems(array $arrNodes)
+    {
+        $childrenItems = [];
         foreach ($arrNodes as $key => $nodeInfo) {
             $pathToParent = explode('/', $nodeInfo[$this->_pathField]);
             array_pop($pathToParent);
             $pathToParent = implode('/', $pathToParent);
             $childrenItems[$pathToParent][] = $nodeInfo;
         }
-        $this->addChildNodes($childrenItems, '', null);
-        return $this;
+        return $childrenItems;
     }
 
     /**
@@ -227,7 +278,7 @@ class Oggetto_News_Model_Resource_Category_Tree extends Varien_Data_Tree_Dbp
         if (!$withRootNode) {
             array_shift($pathIds);
         }
-        $result = array();
+        $result = [];
         if (!empty($pathIds)) {
             if ($addCollectionData) {
                 $select = $this->_createCollectionDataSelect(false);
@@ -292,6 +343,29 @@ class Oggetto_News_Model_Resource_Category_Tree extends Varien_Data_Tree_Dbp
         } else {
             $this->setCollection($collection);
         }
+        $nodeIds = $this->_getNodeIds($exclude);
+        $collection->addIdFilter($nodeIds);
+        $this->_excludeDisabledNodes($collection, $onlyActive);
+        if ($toLoad) {
+            $collection->load();
+            $this->_fillNodeDataFromCollection($collection);
+            foreach ($this->getNodes() as $node) {
+                if (!$collection->getItemById($node->getId()) && $node->getParent()) {
+                    $this->removeNode($node);
+                }
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * Get node ids except excluded
+     *
+     * @param array $exclude Excluded nodes
+     * @return array
+     */
+    protected function _getNodeIds($exclude)
+    {
         if (!is_array($exclude)) {
             $exclude = [$exclude];
         }
@@ -301,28 +375,41 @@ class Oggetto_News_Model_Resource_Category_Tree extends Varien_Data_Tree_Dbp
                 $nodeIds[] = $node->getId();
             }
         }
-        $collection->addIdFilter($nodeIds);
-        if ($onlyActive) {
-            $disabledIds = $this->_getDisabledIds($collection);
-            if ($disabledIds) {
-                $collection->addFieldToFilter('entity_id', ['nin' => $disabledIds]);
-            }
-            $collection->addFieldToFilter('status', 1);
+        return $nodeIds;
+    }
+
+    /**
+     * Exclude disabled nodes
+     *
+     * @param Oggetto_News_Model_Resource_Category_Collection $collection Resource category collection
+     * @param bool                                            $onlyActive Should select only active nodes
+     * @return void
+     */
+    protected function _excludeDisabledNodes($collection, $onlyActive)
+    {
+        if (!$onlyActive) {
+            return;
         }
-        if ($toLoad) {
-            $collection->load();
-            foreach ($collection as $category) {
-                if ($this->getNodeById($category->getId())) {
-                    $this->getNodeById($category->getId())->addData($category->getData());
-                }
-            }
-            foreach ($this->getNodes() as $node) {
-                if (!$collection->getItemById($node->getId()) && $node->getParent()) {
-                    $this->removeNode($node);
-                }
+        $disabledIds = $this->_getDisabledIds($collection);
+        if ($disabledIds) {
+            $collection->addFieldToFilter('entity_id', ['nin' => $disabledIds]);
+        }
+        $collection->addFieldToFilter('status', 1);
+    }
+
+    /**
+     * Fill node data from collection
+     *
+     * @param Oggetto_News_Model_Resource_Category_Collection $collection Resource category collection
+     * @return void
+     */
+    protected function _fillNodeDataFromCollection($collection)
+    {
+        foreach ($collection as $category) {
+            if ($this->getNodeById($category->getId())) {
+                $this->getNodeById($category->getId())->addData($category->getData());
             }
         }
-        return $this;
     }
 
     /**
@@ -420,9 +507,6 @@ class Oggetto_News_Model_Resource_Category_Tree extends Varien_Data_Tree_Dbp
      */
     protected function _getItemIsActive($id)
     {
-        if (!in_array($id, $this->_inactiveItems)) {
-            return true;
-        }
-        return false;
+        return !in_array($id, $this->_inactiveItems);
     }
 }
