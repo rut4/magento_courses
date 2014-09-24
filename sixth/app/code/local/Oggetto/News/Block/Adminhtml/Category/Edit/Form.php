@@ -32,7 +32,6 @@
  */
 class Oggetto_News_Block_Adminhtml_Category_Edit_Form extends Oggetto_News_Block_Adminhtml_Category_Abstract
 {
-
     /**
      * Additional buttons on category page
      */
@@ -225,7 +224,7 @@ class Oggetto_News_Block_Adminhtml_Category_Edit_Form extends Oggetto_News_Block
         if ($this->getCategoryId()) {
             return $this->getCategoryName();
         } else {
-            return Mage::helper('news')->__('New Root Category');
+            return Mage::helper('news')->__('New Category');
         }
     }
 

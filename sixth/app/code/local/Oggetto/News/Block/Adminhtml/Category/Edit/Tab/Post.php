@@ -43,7 +43,7 @@ class Oggetto_News_Block_Adminhtml_Category_Edit_Tab_Post extends Mage_Adminhtml
         $this->setDefaultDir('ASC');
         $this->setUseAjax(true);
         if ($this->getCategory()->getId()) {
-            $this->setDefaultFilter(array('in_posts' => 1));
+            $this->setDefaultFilter(['in_posts' => 1]);
         }
     }
 
@@ -189,20 +189,19 @@ class Oggetto_News_Block_Adminhtml_Category_Edit_Tab_Post extends Mage_Adminhtml
     protected function _addColumnFilterToCollection($column)
     {
         // Set custom filter for in product flag
-        if ($column->getId() == 'in_posts') {
-            $postIds = $this->_getSelectedPosts();
-            if (empty($postIds)) {
-                $postIds = 0;
-            }
-            if ($column->getFilter()->getValue()) {
-                $this->getCollection()->addFieldToFilter('entity_id', ['in' => $postIds]);
-            } else {
-                if ($postIds) {
-                    $this->getCollection()->addFieldToFilter('entity_id', ['nin' => $postIds]);
-                }
-            }
-        } else {
+        if ($column->getId() != 'in_posts') {
             parent::_addColumnFilterToCollection($column);
+            return $this;
+        }
+        $postIds = $this->_getSelectedPosts();
+        if (empty($postIds)) {
+            $postIds = 0;
+        }
+        if ($column->getFilter()->getValue()) {
+            $this->getCollection()->addFieldToFilter('entity_id', ['in' => $postIds]);
+        } elseif ($postIds) {
+            $this->getCollection()->addFieldToFilter('entity_id', ['nin' => $postIds]);
+
         }
         return $this;
     }
