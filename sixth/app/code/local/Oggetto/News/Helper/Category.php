@@ -100,4 +100,14 @@ class Oggetto_News_Helper_Category extends Mage_Core_Helper_Abstract
             return '.' . $suffix;
         }
     }
+
+    /**
+     * Get category recursion
+     *
+     * @return string
+     */
+    public function getRecursion()
+    {
+        return Mage::getStoreConfig('news/category/recursion');
+    }
 }

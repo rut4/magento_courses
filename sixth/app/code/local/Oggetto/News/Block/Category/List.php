@@ -100,21 +100,12 @@ class Oggetto_News_Block_Category_List extends Mage_Core_Block_Template
             return '';
         }
         $children = $category->getChildrenCategories();
-        $activeChildren = array();
-        if ($recursion == 0 || $level < $recursion - 1) {
-            foreach ($children as $child) {
-                if ($child->getStatus()) {
-                    $activeChildren[] = $child;
-                }
-            }
-        }
+        $activeChildren = $this->_getActiveChildren($level, $recursion, $children);
         $html .= '<li>';
         $html .= '<a href="' . $category->getCategoryUrl() . '">' . $category->getName() . '</a>';
         if (count($activeChildren) > 0) {
             $html .= '<ul>';
-            foreach ($children as $child) {
-                $html .= $this->drawCategory($child, $level + 1);
-            }
+            $html = $this->_drawChildren($level, $children, $html);
             $html .= '</ul>';
         }
         $html .= '</li>';
@@ -128,9 +119,47 @@ class Oggetto_News_Block_Category_List extends Mage_Core_Block_Template
      */
     public function getRecursion()
     {
-        if (!$this->hasData('recursion')) {
-            $this->setData('recursion', Mage::getStoreConfig('news/category/recursion'));
+        if (!$this->hasRecursion()) {
+            $this->setRecursion(Mage::helper('news/category')->getRecursion());
         }
         return $this->getData('recursion');
+    }
+
+    /**
+     * Get active children
+     *
+     * @param int                                             $level     Level
+     * @param int                                             $recursion Recursion
+     * @param Oggetto_News_Model_Resource_Category_Collection $children  Child categories
+     * @return array
+     */
+    protected function _getActiveChildren($level, $recursion, $children)
+    {
+        $activeChildren = [];
+        if ($recursion == 0 || $level < $recursion - 1) {
+            $activeChildren = array_filter(
+                array_values($children->getItems()),
+                function ($child) {
+                    return $child->getStatus();
+                }
+            );
+        }
+        return $activeChildren;
+    }
+
+    /**
+     * Draw children
+     *
+     * @param int                                             $level    Category level
+     * @param Oggetto_News_Model_Resource_Category_Collection $children Children collection
+     * @param string                                          $html     Output html
+     * @return string
+     */
+    protected function _drawChildren($level, $children, $html)
+    {
+        foreach ($children as $child) {
+            $html .= $this->drawCategory($child, $level + 1);
+        }
+        return $html;
     }
 }

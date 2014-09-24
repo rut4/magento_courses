@@ -84,7 +84,6 @@ class Oggetto_News_CategoryController
      * View category
      *
      * @return void
-     * @author Ultimate Module Creator
      */
     public function viewAction()
     {

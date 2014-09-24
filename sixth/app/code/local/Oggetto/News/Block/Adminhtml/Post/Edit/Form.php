@@ -34,10 +34,9 @@ class Oggetto_News_Block_Adminhtml_Post_Edit_Form
     extends Mage_Adminhtml_Block_Widget_Form
 {
     /**
-     * prepare form
+     * Prepare form
      *
      * @return Oggetto_News_Block_Adminhtml_Post_Edit_Form
-     * @author Ultimate Module Creator
      */
     protected function _prepareForm()
     {

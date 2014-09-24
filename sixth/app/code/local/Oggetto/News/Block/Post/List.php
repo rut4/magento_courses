@@ -40,7 +40,7 @@ class Oggetto_News_Block_Post_List extends Mage_Core_Block_Template
         parent::__construct();
         $posts = Mage::getResourceModel('news/post_collection')
             ->addFieldToFilter('status', 1);
-        $posts->setOrder('title', 'asc');
+        $posts->setOrder('created_at', 'asc');
         $this->setPosts($posts);
     }
 

@@ -54,40 +54,78 @@ class Oggetto_News_Model_Resource_Post_Category extends Mage_Core_Model_Resource
         if (is_null($categoryIds)) {
             return $this;
         }
-        $oldCategories = $post->getSelectedCategories();
-        $oldCategoryIds = array();
-        foreach ($oldCategories as $category) {
-            $oldCategoryIds[] = $category->getId();
-        }
+        $oldCategoryIds = $this->_getOldCategoryIds($post);
         $insert = array_diff($categoryIds, $oldCategoryIds);
         $delete = array_diff($oldCategoryIds, $categoryIds);
         $write = $this->_getWriteAdapter();
         if (!empty($insert)) {
-            $data = array();
-            foreach ($insert as $categoryId) {
-                if (empty($categoryId)) {
-                    continue;
-                }
-                $data[] = array(
-                    'category_id' => (int)$categoryId,
-                    'post_id' => (int)$post->getId(),
-                    'position' => 1
-                );
-            }
-            if ($data) {
-                $write->insertMultiple($this->getMainTable(), $data);
-            }
+            $this->_insertRelations($post, $insert, $write);
         }
         if (!empty($delete)) {
-            foreach ($delete as $categoryId) {
-                $where = array(
-                    'post_id = ?' => (int)$post->getId(),
-                    'category_id = ?' => (int)$categoryId,
-                );
-                $write->delete($this->getMainTable(), $where);
-            }
+            $this->_removeRelations($post, $delete, $write);
         }
         $post->getResource()->updateUrlPath($post);
         return $this;
+    }
+
+    /**
+     * Get old category ids
+     *
+     * @param Oggetto_News_Model_Post $post Post model
+     * @return array
+     */
+    protected function _getOldCategoryIds($post)
+    {
+        $oldCategories = $post->getSelectedCategories();
+        $oldCategoryIds = [];
+        foreach ($oldCategories as $category) {
+            $oldCategoryIds[] = $category->getId();
+        }
+        return $oldCategoryIds;
+    }
+
+    /**
+     * Insert relations
+     *
+     * @param Oggetto_News_Model_Post     $post   Post model
+     * @param array                       $insert Category relations to insert
+     * @param Varien_Db_Adapter_Interface $write  Write adapter
+     * @return void
+     */
+    protected function _insertRelations($post, $insert, $write)
+    {
+        $data = [];
+        foreach ($insert as $categoryId) {
+            if (empty($categoryId)) {
+                continue;
+            }
+            $data[] = [
+                'category_id' => (int)$categoryId,
+                'post_id'     => (int)$post->getId(),
+                'position'    => 1
+            ];
+        }
+        if ($data) {
+            $write->insertMultiple($this->getMainTable(), $data);
+        }
+    }
+
+    /**
+     * Remove relations
+     *
+     * @param Oggetto_News_Model_Post     $post   Post model
+     * @param array                       $delete Category relations to remove
+     * @param Varien_Db_Adapter_Interface $write  Write adapter
+     * @return void
+     */
+    protected function _removeRelations($post, $delete, $write)
+    {
+        foreach ($delete as $categoryId) {
+            $where = [
+                'post_id = ?'     => (int)$post->getId(),
+                'category_id = ?' => (int)$categoryId,
+            ];
+            $write->delete($this->getMainTable(), $where);
+        }
     }
 }

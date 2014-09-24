@@ -48,7 +48,7 @@ class Oggetto_News_Block_Adminhtml_Category_Edit_Form extends Oggetto_News_Block
     }
 
     /**
-     * prepare the layout
+     * Prepare layout
      *
      * @return Oggetto_News_Block_Adminhtml_Category_Edit_Form=
      */
@@ -59,37 +59,72 @@ class Oggetto_News_Block_Adminhtml_Category_Edit_Form extends Oggetto_News_Block
         $this->setChild('tabs',
             $this->getLayout()->createBlock('news/adminhtml_category_edit_tabs', 'tabs')
         );
-        $this->setChild('save_button',
-            $this->getLayout()->createBlock('adminhtml/widget_button')
-                ->setData([
-                    'label' => Mage::helper('news')->__('Save Category'),
-                    'onclick' => "categorySubmit('" . $this->getSaveUrl() . "', true)",
-                    'class' => 'save'
-                ])
-        );
-        // Delete button
+        $this->_setupSaveButton();
+
         if (!in_array($categoryId, $this->getRootIds())) {
-            $this->setChild('delete_button',
-                $this->getLayout()->createBlock('adminhtml/widget_button')
-                    ->setData([
-                        'label' => Mage::helper('news')->__('Delete Category'),
-                        'onclick' => "categoryDelete('" .
-                            $this->getUrl('*/*/delete', array('_current' => true)) . "', true, {$categoryId})",
-                        'class' => 'delete'
-                    ])
-            );
+            $this->_setupDeleteButton($categoryId);
         }
 
-        // Reset button
-        $resetPath = $category ? '*/*/edit' : '*/*/add';
-        $this->setChild('reset_button',
-            $this->getLayout()->createBlock('adminhtml/widget_button')
+        $this->_setupResetButton($category);
+
+        return parent::_prepareLayout();
+    }
+
+    /**
+     * Setup save button
+     *
+     * @return void
+     */
+    protected function _setupSaveButton()
+    {
+        $this->setChild('save_button',
+            $this->getLayout()
+                ->createBlock('adminhtml/widget_button')
                 ->setData([
-                    'label' => Mage::helper('news')->__('Reset'),
-                    'onclick' => "categoryReset('" . $this->getUrl($resetPath, array('_current' => true)) . "',true)"
+                    'label'   => Mage::helper('news')->__('Save Category'),
+                    'onclick' => "categorySubmit('" . $this->getSaveUrl() . "', true)",
+                    'class'   => 'save'
                 ])
         );
-        return parent::_prepareLayout();
+    }
+
+    /**
+     * Setup delete button
+     *
+     * @param int $categoryId Category id
+     * @return void
+     */
+    protected function _setupDeleteButton($categoryId)
+    {
+        $this->setChild('delete_button',
+            $this->getLayout()
+                ->createBlock('adminhtml/widget_button')
+                ->setData([
+                    'label'   => Mage::helper('news')->__('Delete Category'),
+                    'onclick' => "categoryDelete('" .
+                        $this->getUrl('*/*/delete', ['_current' => true]) . "', true, {$categoryId})",
+                    'class'   => 'delete'
+                ])
+        );
+    }
+
+    /**
+     * Setup reset button
+     *
+     * @param Oggetto_News_Model_Category $category Category model
+     * @return void
+     */
+    protected function _setupResetButton($category)
+    {
+        $resetPath = $category ? '*/*/edit' : '*/*/add';
+        $this->setChild('reset_button',
+            $this->getLayout()
+                ->createBlock('adminhtml/widget_button')
+                ->setData([
+                    'label'   => Mage::helper('news')->__('Reset'),
+                    'onclick' => "categoryReset('" . $this->getUrl($resetPath, ['_current' => true]) . "',true)"
+                ])
+        );
     }
 
     /**
@@ -160,7 +195,6 @@ class Oggetto_News_Block_Adminhtml_Category_Edit_Form extends Oggetto_News_Block
      *
      * @param string $alias Button alias
      * @return Oggetto_News_Block_Adminhtml_Category_Edit_Form
-     * @author Ultimate Module Creator
      */
     public function removeAdditionalButton($alias)
     {
@@ -172,10 +206,9 @@ class Oggetto_News_Block_Adminhtml_Category_Edit_Form extends Oggetto_News_Block
     }
 
     /**
-     * get html for tabs
+     * Get html for tabs
      *
      * @return string
-     * @author Ultimate Module Creator
      */
     public function getTabsHtml()
     {
@@ -183,10 +216,9 @@ class Oggetto_News_Block_Adminhtml_Category_Edit_Form extends Oggetto_News_Block
     }
 
     /**
-     * get the form header
+     * Get the form header
      *
      * @return string
-     * @author Ultimate Module Creator
      */
     public function getHeader()
     {
@@ -198,11 +230,10 @@ class Oggetto_News_Block_Adminhtml_Category_Edit_Form extends Oggetto_News_Block
     }
 
     /**
-     * get the delete url
+     * Get delete url
      *
-     * @param array $args
+     * @param array $args Arguments
      * @return string
-     * @author Ultimate Module Creator
      */
     public function getDeleteUrl(array $args = [])
     {
@@ -211,12 +242,12 @@ class Oggetto_News_Block_Adminhtml_Category_Edit_Form extends Oggetto_News_Block
         return $this->getUrl('*/*/delete', $params);
     }
 
+
     /**
      * Return URL for refresh input element 'path' in form
      *
-     * @param array $args
+     * @param array $args Arguments
      * @return string
-     * @author Ultimate Module Creator
      */
     public function getRefreshPathUrl(array $args = [])
     {
@@ -226,10 +257,9 @@ class Oggetto_News_Block_Adminhtml_Category_Edit_Form extends Oggetto_News_Block
     }
 
     /**
-     * check if request is ajax
+     * Check if request is ajax
      *
      * @return bool
-     * @author Ultimate Module Creator
      */
     public function isAjax()
     {
@@ -237,21 +267,32 @@ class Oggetto_News_Block_Adminhtml_Category_Edit_Form extends Oggetto_News_Block
     }
 
     /**
-     * get  in json format
+     * Get in json format
      *
      * @return string
-     * @author Ultimate Module Creator
      */
     public function getPostsJson()
     {
         $posts = $this->getCategory()->getSelectedPosts();
         if (!empty($posts)) {
-            $positions = array();
-            foreach ($posts as $post) {
-                $positions[$post->getId()] = $post->getPosition();
-            }
+            $positions = $this->_getPostPositions($posts);
             return Mage::helper('core')->jsonEncode($positions);
         }
         return '{}';
+    }
+
+    /**
+     * Get post id => position array
+     *
+     * @param array $posts Posts
+     * @return array
+     */
+    protected function _getPostPositions($posts)
+    {
+        $positions = [];
+        foreach ($posts as $post) {
+            $positions[$post->getId()] = $post->getPosition();
+        }
+        return $positions;
     }
 }

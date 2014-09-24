@@ -39,24 +39,6 @@ class Oggetto_News_Model_Resource_Post_Category_Collection extends Oggetto_News_
     protected $_joinedFields = false;
 
     /**
-     * Join the link table
-     *
-     * @return Oggetto_News_Model_Resource_Post_Category_Collection
-     */
-    public function joinFields()
-    {
-        if (!$this->_joinedFields) {
-            $this->getSelect()->join(
-                array('related' => $this->getTable('news/post_category')),
-                'related.category_id = main_table.entity_id',
-                array('position')
-            );
-            $this->_joinedFields = true;
-        }
-        return $this;
-    }
-
-    /**
      * Add post filter
      *
      * @param Oggetto_News_Model_Post|int $post Post
@@ -71,6 +53,24 @@ class Oggetto_News_Model_Resource_Post_Category_Collection extends Oggetto_News_
             $this->joinFields();
         }
         $this->getSelect()->where('related.post_id = ?', $post);
+        return $this;
+    }
+
+    /**
+     * Join the link table
+     *
+     * @return Oggetto_News_Model_Resource_Post_Category_Collection
+     */
+    public function joinFields()
+    {
+        if (!$this->_joinedFields) {
+            $this->getSelect()->join(
+                ['related' => $this->getTable('news/post_category')],
+                'related.category_id = main_table.entity_id',
+                ['position']
+            );
+            $this->_joinedFields = true;
+        }
         return $this;
     }
 }

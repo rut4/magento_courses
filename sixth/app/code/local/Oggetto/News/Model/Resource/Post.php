@@ -95,19 +95,32 @@ class Oggetto_News_Model_Resource_Post extends Oggetto_News_Model_Resource_Entit
             if ($entityId == $object->getId() || empty($entityId)) {
                 $validKey = true;
             } else {
-                $parts = explode('-', $urlKey);
-                $last = $parts[count($parts) - 1];
-                if (!is_numeric($last)) {
-                    $urlKey = $urlKey . '-1';
-                } else {
-                    $suffix = '-' . ($last + 1);
-                    unset($parts[count($parts) - 1]);
-                    $urlKey = implode('-', $parts) . $suffix;
-                }
+                $urlKey = $this->_prepareUrlKey($urlKey);
             }
         }
         $object->setData('url_key', $urlKey);
         return parent::_beforeSave($object);
+    }
+
+    /**
+     * Prepare url key
+     *
+     * @param string $urlKey Url key
+     * @return string
+     */
+    protected function _prepareUrlKey($urlKey)
+    {
+        $parts = explode('-', $urlKey);
+        $last = $parts[count($parts) - 1];
+        if (!is_numeric($last)) {
+            $urlKey = $urlKey . '-1';
+            return $urlKey;
+        } else {
+            $suffix = '-' . ($last + 1);
+            unset($parts[count($parts) - 1]);
+            $urlKey = implode('-', $parts) . $suffix;
+            return $urlKey;
+        }
     }
 
     /**

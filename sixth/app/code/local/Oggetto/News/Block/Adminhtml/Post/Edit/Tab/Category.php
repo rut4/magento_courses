@@ -223,7 +223,6 @@ class Oggetto_News_Block_Adminhtml_Post_Edit_Tab_Category extends Oggetto_News_B
      *
      * @param mixed $rootId Root category Id for context
      * @return array
-     * @author Ultimate Module Creator
      */
     public function getSelectedCategoryPathIds($rootId = false)
     {

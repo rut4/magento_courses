@@ -38,8 +38,7 @@ class Oggetto_News_Block_Post_Category_List extends Oggetto_News_Block_Category_
     public function __construct()
     {
         parent::__construct();
-        $post = $this->getPost();
-        if ($post) {
+        if ($post = $this->getPost()) {
             $this->getCategories()->addPostFilter($post->getId());
             $this->getCategories()->unshiftOrder('related_post.position', 'ASC');
         }

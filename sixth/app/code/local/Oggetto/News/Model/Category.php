@@ -212,15 +212,11 @@ class Oggetto_News_Model_Category extends Mage_Core_Model_Abstract
             $resource->updateUrlPath($this);
 
             $this->_moveChildCategories();
-            $moveComplete = true;
         } catch (Exception $e) {
             $resource->rollBack();
-            $moveComplete = false;
             throw $e;
         }
-        if ($moveComplete) {
-            Mage::app()->cleanCache([self::CACHE_TAG]);
-        }
+        Mage::app()->cleanCache([self::CACHE_TAG]);
         return $this;
     }
 
@@ -415,7 +411,7 @@ class Oggetto_News_Model_Category extends Mage_Core_Model_Abstract
     /**
      * Return children categories of current category
      *
-     * @return array
+     * @return Oggetto_News_Model_Resource_Category_Collection
      */
     public function getChildrenCategories()
     {

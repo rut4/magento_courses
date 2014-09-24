@@ -30,7 +30,7 @@
  * @subpackage Model
  * @author     Eduard Paliy <epaliy@oggettoweb.com>
  */
-class Oggetto_News_Model_Resource_Post_Collection  extends Mage_Core_Model_Resource_Db_Collection_Abstract
+class Oggetto_News_Model_Resource_Post_Collection extends Mage_Core_Model_Resource_Db_Collection_Abstract
 {
     protected $_joinedFields = [];
 
@@ -46,31 +46,6 @@ class Oggetto_News_Model_Resource_Post_Collection  extends Mage_Core_Model_Resou
     }
 
     /**
-     * Get posts as array
-     *
-     * @param string $valueField Value field
-     * @param string $labelField Label field
-     * @param array  $additional Additional
-     * @return array
-     */
-    protected function _toOptionArray($valueField = 'entity_id', $labelField = 'title', $additional = [])
-    {
-        return parent::_toOptionArray($valueField, $labelField, $additional);
-    }
-
-    /**
-     * Get options hash
-     *
-     * @param string $valueField Value field
-     * @param string $labelField Label field
-     * @return array
-     */
-    protected function _toOptionHash($valueField = 'entity_id', $labelField = 'title')
-    {
-        return parent::_toOptionHash($valueField, $labelField);
-    }
-
-    /**
      * Add the category filter to collection
      *
      * @param Oggetto_News_Model_Category|int $category Category or it's id
@@ -83,9 +58,9 @@ class Oggetto_News_Model_Resource_Post_Collection  extends Mage_Core_Model_Resou
         }
         if (!isset($this->_joinedFields['category'])) {
             $this->getSelect()->join(
-                array('related_category' => $this->getTable('news/post_category')),
+                ['related_category' => $this->getTable('news/post_category')],
                 'related_category.post_id = main_table.entity_id',
-                array('position')
+                ['position']
             );
             $this->getSelect()->where('related_category.category_id = ?', $category);
             $this->_joinedFields['category'] = true;
@@ -104,5 +79,30 @@ class Oggetto_News_Model_Resource_Post_Collection  extends Mage_Core_Model_Resou
         $countSelect = parent::getSelectCountSql();
         $countSelect->reset(Zend_Db_Select::GROUP);
         return $countSelect;
+    }
+
+    /**
+     * Get posts as array
+     *
+     * @param string $valueField Value field
+     * @param string $labelField Label field
+     * @param array $additional Additional
+     * @return array
+     */
+    protected function _toOptionArray($valueField = 'entity_id', $labelField = 'title', $additional = [])
+    {
+        return parent::_toOptionArray($valueField, $labelField, $additional);
+    }
+
+    /**
+     * Get options hash
+     *
+     * @param string $valueField Value field
+     * @param string $labelField Label field
+     * @return array
+     */
+    protected function _toOptionHash($valueField = 'entity_id', $labelField = 'title')
+    {
+        return parent::_toOptionHash($valueField, $labelField);
     }
 }

@@ -53,6 +53,7 @@ $table = $this->getConnection()
     ->addColumn('created_at', Varien_Db_Ddl_Table::TYPE_TIMESTAMP, null, [], 'Category Creation Time')
     ->setComment('Category Table');
 $this->getConnection()->createTable($table);
+
 $table = $this->getConnection()
     ->newTable($this->getTable('news/post'))
     ->addColumn('entity_id', Varien_Db_Ddl_Table::TYPE_INTEGER, null, [
@@ -72,6 +73,7 @@ $table = $this->getConnection()
     ->addColumn('created_at', Varien_Db_Ddl_Table::TYPE_TIMESTAMP, null, [], 'Post Creation Time')
     ->setComment('Post Table');
 $this->getConnection()->createTable($table);
+
 $table = $this->getConnection()
     ->newTable($this->getTable('news/category_post'))
     ->addColumn('rel_id', Varien_Db_Ddl_Table::TYPE_INTEGER, null, [
@@ -116,4 +118,5 @@ $table = $this->getConnection()
     )
     ->setComment('Category to Post Linkage Table');
 $this->getConnection()->createTable($table);
+
 $this->endSetup();

@@ -39,6 +39,7 @@ class Oggetto_News_Model_Resource_Entity extends Mage_Core_Model_Resource_Db_Abs
      */
     protected function _construct()
     {
+        parent::_construct();
     }
 
     /**
@@ -46,7 +47,7 @@ class Oggetto_News_Model_Resource_Entity extends Mage_Core_Model_Resource_Db_Abs
      *
      * @param string $urlKey Url key
      * @param bool   $active Is active
-     * @return mixed
+     * @return string
      */
     public function checkUrlKey($urlKey, $active = true)
     {

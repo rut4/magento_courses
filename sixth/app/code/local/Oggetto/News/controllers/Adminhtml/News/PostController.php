@@ -121,80 +121,83 @@ class Oggetto_News_Adminhtml_News_PostController extends Mage_Adminhtml_Controll
      */
     public function saveAction()
     {
-        if ($data = $this->getRequest()->getPost('post')) {
-            try {
-                $post = $this->_initPost();
-                $post->addData($data);
-                $categories = $this->getRequest()->getPost('category_ids', -1);
-                if ($categories != -1) {
-                    $categories = explode(',', $categories);
-                    $categories = array_unique($categories);
-                    $post->setCategoriesData($categories);
-                }
-                $post->save();
-                Mage::getSingleton('adminhtml/session')
-                    ->addSuccess(Mage::helper('news')->__('Post was successfully saved'));
-                Mage::getSingleton('adminhtml/session')->setFormData(false);
-                if ($this->getRequest()->getParam('back')) {
-                    $this->_redirect('*/*/edit', array('id' => $post->getId()));
-                    return;
-                }
-                $this->_redirect('*/*/');
-                return;
-            } catch (Mage_Core_Exception $e) {
-                Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
-                Mage::getSingleton('adminhtml/session')->setPostData($data);
-                $this->_redirect('*/*/edit', array('id' => $this->getRequest()->getParam('id')));
-                return;
-            } catch (Exception $e) {
-                Mage::logException($e);
-                Mage::getSingleton('adminhtml/session')
-                    ->addError(Mage::helper('news')->__('There was a problem saving the post.'));
-                Mage::getSingleton('adminhtml/session')->setPostData($data);
-                $this->_redirect('*/*/edit', array('id' => $this->getRequest()->getParam('id')));
+        $data = $this->getRequest()->getPost('post');
+        if (!$data) {
+            Mage::getSingleton('adminhtml/session')->addError(Mage::helper('news')->__('Unable to find post to save.'));
+            $this->_redirect('*/*/');
+            return;
+        }
+
+        try {
+            $post = $this->_initPost();
+            $post->addData($data);
+            $categories = $this->getRequest()->getPost('category_ids', -1);
+            if ($categories != -1) {
+                $categories = explode(',', $categories);
+                $categories = array_unique($categories);
+                $post->setCategoriesData($categories);
+            }
+            $post->save();
+            Mage::getSingleton('adminhtml/session')
+                ->addSuccess(Mage::helper('news')->__('Post was successfully saved'));
+            Mage::getSingleton('adminhtml/session')->setFormData(false);
+            if ($this->getRequest()->getParam('back')) {
+                $this->_redirect('*/*/edit', ['id' => $post->getId()]);
                 return;
             }
+            $this->_redirect('*/*/');
+            return;
+        } catch (Mage_Core_Exception $e) {
+            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+            Mage::getSingleton('adminhtml/session')->setPostData($data);
+            $this->_redirect('*/*/edit', ['id' => $this->getRequest()->getParam('id')]);
+            return;
+        } catch (Exception $e) {
+            Mage::logException($e);
+            Mage::getSingleton('adminhtml/session')
+                ->addError(Mage::helper('news')->__('There was a problem saving the post.'));
+            Mage::getSingleton('adminhtml/session')->setPostData($data);
+            $this->_redirect('*/*/edit', ['id' => $this->getRequest()->getParam('id')]);
+            return;
         }
-        Mage::getSingleton('adminhtml/session')->addError(Mage::helper('news')->__('Unable to find post to save.'));
-        $this->_redirect('*/*/');
     }
 
     /**
-     * delete post - action
+     * Delete post - action
      *
      * @return void
-     * @author Ultimate Module Creator
      */
     public function deleteAction()
     {
-        if ($this->getRequest()->getParam('id') > 0) {
-            try {
-                $post = Mage::getModel('news/post');
-                $post->setId($this->getRequest()->getParam('id'))->delete();
-                Mage::getSingleton('adminhtml/session')
-                    ->addSuccess(Mage::helper('news')->__('Post was successfully deleted.'));
-                $this->_redirect('*/*/');
-                return;
-            } catch (Mage_Core_Exception $e) {
-                Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
-                $this->_redirect('*/*/edit', array('id' => $this->getRequest()->getParam('id')));
-            } catch (Exception $e) {
-                Mage::getSingleton('adminhtml/session')
-                    ->addError(Mage::helper('news')->__('There was an error deleting post.'));
-                $this->_redirect('*/*/edit', array('id' => $this->getRequest()->getParam('id')));
-                Mage::logException($e);
-                return;
-            }
+        if ($this->getRequest()->getParam('id') <= 0) {
+            Mage::getSingleton('adminhtml/session')
+                ->addError(Mage::helper('news')->__('Could not find post to delete.'));
+            $this->_redirect('*/*/');
+            return;
         }
-        Mage::getSingleton('adminhtml/session')->addError(Mage::helper('news')->__('Could not find post to delete.'));
-        $this->_redirect('*/*/');
+        try {
+            $post = Mage::getModel('news/post');
+            $post->setId($this->getRequest()->getParam('id'))->delete();
+            Mage::getSingleton('adminhtml/session')
+                ->addSuccess(Mage::helper('news')->__('Post was successfully deleted.'));
+            $this->_redirect('*/*/');
+            return;
+        } catch (Mage_Core_Exception $e) {
+            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+            $this->_redirect('*/*/edit', ['id' => $this->getRequest()->getParam('id')]);
+        } catch (Exception $e) {
+            Mage::getSingleton('adminhtml/session')
+                ->addError(Mage::helper('news')->__('There was an error deleting post.'));
+            $this->_redirect('*/*/edit', ['id' => $this->getRequest()->getParam('id')]);
+            Mage::logException($e);
+            return;
+        }
     }
 
     /**
-     * mass delete post - action
+     * Mass delete post - action
      *
      * @return void
-     * @author Ultimate Module Creator
      */
     public function massDeleteAction()
     {
@@ -202,66 +205,80 @@ class Oggetto_News_Adminhtml_News_PostController extends Mage_Adminhtml_Controll
         if (!is_array($postIds)) {
             Mage::getSingleton('adminhtml/session')
                 ->addError(Mage::helper('news')->__('Please select posts to delete.'));
-        } else {
-            try {
-                foreach ($postIds as $postId) {
-                    $post = Mage::getModel('news/post');
-                    $post->setId($postId)->delete();
-                }
-                Mage::getSingleton('adminhtml/session')
-                    ->addSuccess(
-                        Mage::helper('news')->__('Total of %d posts were successfully deleted.',
-                            count($postIds))
-                    );
-            } catch (Mage_Core_Exception $e) {
-                Mage::getSingleton('adminhtml/session')
-                    ->addError($e->getMessage());
-            } catch (Exception $e) {
-                Mage::getSingleton('adminhtml/session')
-                    ->addError(Mage::helper('news')->__('There was an error deleting posts.'));
-                Mage::logException($e);
+            $this->_redirect('*/*/index');
+            return;
+        }
+        try {
+            foreach ($postIds as $postId) {
+                $post = Mage::getModel('news/post');
+                $post->setId($postId)->delete();
             }
+            Mage::getSingleton('adminhtml/session')
+                ->addSuccess(
+                    Mage::helper('news')->__('Total of %d posts were successfully deleted.',
+                        count($postIds))
+                );
+        } catch (Mage_Core_Exception $e) {
+            Mage::getSingleton('adminhtml/session')
+                ->addError($e->getMessage());
+        } catch (Exception $e) {
+            Mage::getSingleton('adminhtml/session')
+                ->addError(Mage::helper('news')->__('There was an error deleting posts.'));
+            Mage::logException($e);
         }
         $this->_redirect('*/*/index');
     }
 
     /**
-     * mass status change - action
+     * Mass status change
      *
      * @return void
-     * @author Ultimate Module Creator
      */
     public function massStatusAction()
     {
-        $postIds = $this->getRequest()->getParam('post');
-        if (!is_array($postIds)) {
-            Mage::getSingleton('adminhtml/session')->addError(Mage::helper('news')->__('Please select posts.'));
-        } else {
-            try {
-                foreach ($postIds as $postId) {
-                    $post = Mage::getSingleton('news/post')->load($postId)
-                        ->setStatus($this->getRequest()->getParam('status'))
-                        ->setIsMassupdate(true)
-                        ->save();
-                }
-                $this->_getSession()
-                    ->addSuccess($this->__('Total of %d posts were successfully updated.', count($postIds)));
-            } catch (Mage_Core_Exception $e) {
-                Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
-            } catch (Exception $e) {
-                Mage::getSingleton('adminhtml/session')
-                    ->addError(Mage::helper('news')->__('There was an error updating posts.'));
-                Mage::logException($e);
+        try {
+            $idCount = $this->_updateStatus();
+            if (!$idCount) {
+                Mage::getSingleton('adminhtml/session')->addError(Mage::helper('news')->__('Please select posts.'));
+                $this->_redirect('*/*/index');
+                return;
             }
+            $this->_getSession()
+                ->addSuccess($this->__('Total of %d posts were successfully updated.', $idCount));
+        } catch (Mage_Core_Exception $e) {
+            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+        } catch (Exception $e) {
+            Mage::getSingleton('adminhtml/session')
+                ->addError(Mage::helper('news')->__('There was an error updating posts.'));
+            Mage::logException($e);
         }
         $this->_redirect('*/*/index');
     }
 
     /**
-     * get categories action
+     * Update post status
+     *
+     * @return int
+     */
+    protected function _updateStatus()
+    {
+        $postIds = $this->getRequest()->getParam('post');
+        if (!is_array($postIds)) {
+            return null;
+        }
+        foreach ($postIds as $postId) {
+            Mage::getSingleton('news/post')->load($postId)
+                ->setStatus($this->getRequest()->getParam('status'))
+                ->setIsMassupdate(true)
+                ->save();
+        }
+        return count($postIds);
+    }
+
+    /**
+     * Get categories action
      *
      * @return void
-     * @author Ultimate Module Creator
      */
     public function categoriesAction()
     {
@@ -271,10 +288,9 @@ class Oggetto_News_Adminhtml_News_PostController extends Mage_Adminhtml_Controll
     }
 
     /**
-     * get child categories  action
+     * Get child categories  action
      *
      * @return void
-     * @author Ultimate Module Creator
      */
     public function categoriesJsonAction()
     {
@@ -286,10 +302,9 @@ class Oggetto_News_Adminhtml_News_PostController extends Mage_Adminhtml_Controll
     }
 
     /**
-     * export as csv - action
+     * Export as csv
      *
      * @return void
-     * @author Ultimate Module Creator
      */
     public function exportCsvAction()
     {
@@ -299,10 +314,9 @@ class Oggetto_News_Adminhtml_News_PostController extends Mage_Adminhtml_Controll
     }
 
     /**
-     * export as MsExcel - action
+     * Export as MsExcel
      *
      * @return void
-     * @author Ultimate Module Creator
      */
     public function exportExcelAction()
     {
@@ -312,10 +326,9 @@ class Oggetto_News_Adminhtml_News_PostController extends Mage_Adminhtml_Controll
     }
 
     /**
-     * export as xml - action
+     * Export as xml
      *
      * @return void
-     * @author Ultimate Module Creator
      */
     public function exportXmlAction()
     {
@@ -328,7 +341,6 @@ class Oggetto_News_Adminhtml_News_PostController extends Mage_Adminhtml_Controll
      * Check if admin has permissions to visit related pages
      *
      * @return boolean
-     * @author Ultimate Module Creator
      */
     protected function _isAllowed()
     {

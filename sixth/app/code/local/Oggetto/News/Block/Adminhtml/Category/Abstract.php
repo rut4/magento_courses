@@ -205,7 +205,6 @@ class Oggetto_News_Block_Adminhtml_Category_Abstract extends Mage_Adminhtml_Bloc
      * Return root ids
      *
      * @return array
-     * @author Ultimate Module Creator
      */
     public function getRootIds()
     {

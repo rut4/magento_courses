@@ -36,7 +36,6 @@ class Oggetto_News_Block_Adminhtml_Helper_Wysiwyg extends Varien_Data_Form_Eleme
      * Retrieve additional html and put it at the end of element html
      *
      * @return string
-     * @author Ultimate Module Creator
      */
     public function getAfterElementHtml()
     {

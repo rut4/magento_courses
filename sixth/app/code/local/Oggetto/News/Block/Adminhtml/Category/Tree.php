@@ -108,7 +108,6 @@ class Oggetto_News_Block_Adminhtml_Category_Tree extends Oggetto_News_Block_Admi
      * Get html for add child button
      *
      * @return string
-     * @author Ultimate Module Creator
      */
     public function getAddSubButtonHtml()
     {
