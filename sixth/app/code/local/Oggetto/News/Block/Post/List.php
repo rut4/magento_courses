@@ -63,6 +63,7 @@ class Oggetto_News_Block_Post_List extends Mage_Core_Block_Template
      * Get the pager html
      *
      * @return string
+     *
      */
     public function getPagerHtml()
     {

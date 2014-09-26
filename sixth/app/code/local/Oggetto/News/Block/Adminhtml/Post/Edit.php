@@ -40,13 +40,13 @@ class Oggetto_News_Block_Adminhtml_Post_Edit extends Mage_Adminhtml_Block_Widget
         parent::__construct();
         $this->_blockGroup = 'news';
         $this->_controller = 'adminhtml_post';
-        $this->_updateButton('save', 'label', Mage::helper('news')->__('Save Post'));
-        $this->_updateButton('delete', 'label', Mage::helper('news')->__('Delete Post'));
-        $this->_addButton('saveandcontinue', array(
-            'label' => Mage::helper('news')->__('Save And Continue Edit'),
+        $this->updateButton('save', 'label', Mage::helper('news')->__('Save Post'));
+        $this->updateButton('delete', 'label', Mage::helper('news')->__('Delete Post'));
+        $this->addButton('saveandcontinue', [
+            'label'   => Mage::helper('news')->__('Save And Continue Edit'),
             'onclick' => 'saveAndContinueEdit()',
-            'class' => 'save',
-        ), -100);
+            'class'   => 'save',
+        ], -100);
         $this->_formScripts[] = "
             function saveAndContinueEdit(){
                 editForm.submit($('edit_form').action+'back/edit/');

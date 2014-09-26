@@ -39,8 +39,8 @@ class Oggetto_News_Block_Category_List extends Mage_Core_Block_Template
     {
         parent::__construct();
         $categories = Mage::getResourceModel('news/category_collection')
-            ->addFieldToFilter('status', 1);;
-        $categories->getSelect()->order('main_table.position');
+            ->addFieldToFilter('status', 1);
+        $categories->setOrder('position', 'asc');
         $this->setCategories($categories);
     }
 
@@ -53,7 +53,7 @@ class Oggetto_News_Block_Category_List extends Mage_Core_Block_Template
     {
         parent::_prepareLayout();
         $this->getCategories()->addFieldToFilter('level', 1);
-        if ($this->_getDisplayMode() == 0) {
+        if ($this->getDisplayMode() == 0) {
             $pager = $this->getLayout()->createBlock('page/html_pager', 'news.categories.html.pager')
                 ->setCollection($this->getCategories());
             $this->setChild('pager', $pager);
@@ -73,13 +73,13 @@ class Oggetto_News_Block_Category_List extends Mage_Core_Block_Template
     }
 
     /**
-     * Get the display mode
+     * Get display mode
      *
      * @return int
      */
-    protected function _getDisplayMode()
+    public function getDisplayMode()
     {
-        return Mage::getStoreConfigFlag('news/category/tree');
+        return Mage::helper('news/category')->getDisplayMode();
     }
 
     /**
@@ -91,14 +91,14 @@ class Oggetto_News_Block_Category_List extends Mage_Core_Block_Template
      */
     public function drawCategory($category, $level = 0)
     {
-        $html = '';
+        if (!$category->getStatus()) {
+            return '';
+        }
         $recursion = $this->getRecursion();
         if ($recursion !== '0' && $level >= $recursion) {
             return '';
         }
-        if (!$category->getStatus()) {
-            return '';
-        }
+        $html = '';
         $children = $category->getChildrenCategories();
         $activeChildren = $this->_getActiveChildren($level, $recursion, $children);
         $html .= '<li>';

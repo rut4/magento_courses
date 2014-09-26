@@ -23,24 +23,40 @@
  */
 
 /**
- * Post admin block
+ * Post view block test
  *
  * @category   Oggetto
  * @package    Oggetto_News
- * @subpackage Block
+ * @subpackage Test
  * @author     Eduard Paliy <epaliy@oggettoweb.com>
  */
-class Oggetto_News_Block_Adminhtml_Post extends Mage_Adminhtml_Block_Widget_Grid_Container
+class Oggetto_News_Test_Block_Post_View extends EcomDev_PHPUnit_Test_Case
 {
     /**
-     * Class constructor
+     * Test is available via alias
+     *
+     * @return void
      */
-    public function __construct()
+    public function testIsAvailableViaAlias()
     {
-        $this->_controller = 'adminhtml_post';
-        $this->_blockGroup = 'news';
-        parent::__construct();
-        $this->_headerText = Mage::helper('news')->__('Post');
-        $this->updateButton('add', 'label', Mage::helper('news')->__('Add Post'));
+        $this->assertInstanceOf('Oggetto_News_Block_Post_View',
+            $this->getBlockMock('news/post_view'));
+    }
+
+    /**
+     * Test returns current post from registry
+     *
+     * @return void
+     */
+    public function testReturnsCurrentPostFromRegistry()
+    {
+        $post = Mage::getModel('news/post');
+
+        Mage::unregister('current_post');
+        Mage::register('current_post', $post);
+
+        $block = new Oggetto_News_Block_Post_View;
+
+        $this->assertEquals($post, $block->getCurrentPost());
     }
 }

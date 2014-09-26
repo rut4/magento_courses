@@ -23,24 +23,40 @@
  */
 
 /**
- * Post admin block
+ * Category view block test
  *
  * @category   Oggetto
  * @package    Oggetto_News
- * @subpackage Block
+ * @subpackage Test
  * @author     Eduard Paliy <epaliy@oggettoweb.com>
  */
-class Oggetto_News_Block_Adminhtml_Post extends Mage_Adminhtml_Block_Widget_Grid_Container
+class Oggetto_News_Test_Block_Category_View extends EcomDev_PHPUnit_Test_Case
 {
     /**
-     * Class constructor
+     * Test is available via alias
+     *
+     * @return void
      */
-    public function __construct()
+    public function testIsAvailableViaAlias()
     {
-        $this->_controller = 'adminhtml_post';
-        $this->_blockGroup = 'news';
-        parent::__construct();
-        $this->_headerText = Mage::helper('news')->__('Post');
-        $this->updateButton('add', 'label', Mage::helper('news')->__('Add Post'));
+        $this->assertInstanceOf('Oggetto_News_Block_Category_View',
+            $this->getBlockMock('news/category_view'));
+    }
+
+    /**
+     * Test returns current category from registry
+     *
+     * @return void
+     */
+    public function testReturnsCurrentPostFromRegistry()
+    {
+        $category = Mage::getModel('news/category');
+
+        Mage::unregister('current_category');
+        Mage::register('current_category', $category);
+
+        $block = new Oggetto_News_Block_Category_View;
+
+        $this->assertEquals($category, $block->getCurrentCategory());
     }
 }

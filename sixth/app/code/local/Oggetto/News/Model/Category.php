@@ -86,8 +86,8 @@ class Oggetto_News_Model_Category extends Mage_Core_Model_Abstract
      */
     public function getCategoryUrl()
     {
-        if ($urlPath = $this->getUrlPath()) {
-            return Mage::getModel('core/url')->getDirectUrl($urlPath);
+        if (($url = $this->getUrlPath()) || ($url = $this->getUrlKey())) {
+            return Mage::getModel('core/url')->getDirectUrl($url);
         }
         return Mage::getUrl('news/category/view', ['id' => $this->getId()]);
     }

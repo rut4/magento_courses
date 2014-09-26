@@ -133,20 +133,21 @@ class Oggetto_News_Block_Adminhtml_Category_Abstract extends Mage_Adminhtml_Bloc
     public function getRootByIds(array $ids)
     {
         $root = Mage::registry('root');
-        if (null === $root) {
-            $categoryTreeResource = Mage::getResourceSingleton('news/category_tree');
-            $ids = $categoryTreeResource->getExistingCategoryIdsBySpecifiedIds($ids);
-            $tree = $categoryTreeResource->loadByIds($ids);
-            $rootId = Mage::helper('news/category')->getRootCategoryId();
-            $root = $tree->getNodeById($rootId);
-            if ($root && $rootId != Mage::helper('news/category')->getRootCategoryId()) {
-                $root->setIsVisible(true);
-            } else if ($root && $root->getId() == Mage::helper('news/category')->getRootCategoryId()) {
-                $root->setName(Mage::helper('news')->__('Root'));
-            }
-            $tree->addCollectionData($this->getCategoryCollection());
-            Mage::register('root', $root);
+        if ($root !== null) {
+            return $root;
         }
+        $categoryTreeResource = Mage::getResourceSingleton('news/category_tree');
+        $ids = $categoryTreeResource->getExistingCategoryIdsBySpecifiedIds($ids);
+        $tree = $categoryTreeResource->loadByIds($ids);
+        $rootId = Mage::helper('news/category')->getRootCategoryId();
+        $root = $tree->getNodeById($rootId);
+        if ($root && $rootId != Mage::helper('news/category')->getRootCategoryId()) {
+            $root->setIsVisible(true);
+        } else if ($root && $root->getId() == Mage::helper('news/category')->getRootCategoryId()) {
+            $root->setName(Mage::helper('news')->__('Root'));
+        }
+        $tree->addCollectionData($this->getCategoryCollection());
+        Mage::register('root', $root);
         return $root;
     }
 
@@ -161,7 +162,6 @@ class Oggetto_News_Block_Adminhtml_Category_Abstract extends Mage_Adminhtml_Bloc
     {
         $tree = Mage::getResourceModel('news/category_tree');
         $nodeId = $parentNodeCategory->getId();
-        $parentId = $parentNodeCategory->getParentId();
         $node = $tree->loadNode($nodeId);
         $node->loadChildren($recursionLevel);
         if ($node && $nodeId != Mage::helper('news/category')->getRootCategoryId()) {

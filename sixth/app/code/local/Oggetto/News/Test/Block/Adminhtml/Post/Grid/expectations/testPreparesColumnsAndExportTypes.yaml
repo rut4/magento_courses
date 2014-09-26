@@ -1,0 +1,54 @@
+-
+  id: entity_id
+  params:
+    header: Id
+    index: entity_id
+    type: number
+-
+  id: title
+  params:
+    header: Title
+    align: left
+    index: title
+-
+  id: status
+  params:
+    header: Status
+    index: status
+    type: options
+    options:
+      - Disabled
+      - Enabled
+-
+  id: url_key
+  params:
+    header: URL key
+    index: url_key
+-
+  id: created_at
+  params:
+    header: Created at
+    index: created_at
+    type: datetime
+    width: 120px
+-
+  id: action
+  params:
+    header: Action
+    width: '100'
+    type: action
+    getter: getId
+    actions:
+      - caption: Edit
+        url:
+          base: */*/edit
+        field: id
+    filter: false
+    is_system: true
+    sortable: false
+
+
+
+
+
+

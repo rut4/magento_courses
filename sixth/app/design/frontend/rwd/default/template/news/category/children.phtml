@@ -35,7 +35,7 @@
     <div class="page-title category-title">
         <h2><?php echo $this->getCurrentCategory()->getName(); ?></h2>
     </div>
-    <?php if ($this->_getDisplayMode() == 0): ?>
+    <?php if ($this->getDisplayMode() == 0): ?>
         <div class="category-list-container">
             <?php foreach ($categories as $category): ?>
                 <div class="category-list-item">

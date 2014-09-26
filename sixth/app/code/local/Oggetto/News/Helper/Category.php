@@ -110,4 +110,14 @@ class Oggetto_News_Helper_Category extends Mage_Core_Helper_Abstract
     {
         return Mage::getStoreConfig('news/category/recursion');
     }
+
+    /**
+     * Get display mode
+     *
+     * @return bool
+     */
+    public function getDisplayMode()
+    {
+        return Mage::getStoreConfigFlag('news/category/tree');
+    }
 }

@@ -50,16 +50,16 @@ class Oggetto_News_Block_Adminhtml_Post_Edit_Tabs extends Mage_Adminhtml_Block_W
      */
     protected function _beforeToHtml()
     {
-        $this->addTab('form_post', array(
-            'label' => Mage::helper('news')->__('Post'),
-            'title' => Mage::helper('news')->__('Post'),
+        $this->addTab('form_post', [
+            'label'   => Mage::helper('news')->__('Post'),
+            'title'   => Mage::helper('news')->__('Post'),
             'content' => $this->getLayout()->createBlock('news/adminhtml_post_edit_tab_form')->toHtml(),
-        ));
-        $this->addTab('categories', array(
+        ]);
+        $this->addTab('categories', [
             'label' => Mage::helper('news')->__('Categories'),
-            'url' => $this->getUrl('*/*/categories', array('_current' => true)),
+            'url'   => $this->getUrl('*/*/categories', ['_current' => true]),
             'class' => 'ajax'
-        ));
+        ]);
         return parent::_beforeToHtml();
     }
 

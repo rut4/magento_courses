@@ -36,7 +36,7 @@
     <h1><?php echo Mage::helper('news')->__('Categories') ?></h1>
 </div>
 <?php if ($categories->getSize() > 0) : ?>
-    <?php if ($this->_getDisplayMode() == 0) : ?>
+    <?php if ($this->getDisplayMode() == 0) : ?>
         <?php echo $this->getPagerHtml(); ?>
         <div class="category-list-container">
             <?php foreach ($categories as $_category) : ?>
