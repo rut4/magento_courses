@@ -23,7 +23,7 @@
  */
 
 /**
- * post - category relation edit block
+ * Post - category relation edit block
  *
  * @category   Oggetto
  * @package    Oggetto_News
@@ -45,13 +45,13 @@ class Oggetto_News_Block_Adminhtml_Post_Edit_Tab_Category extends Oggetto_News_B
     }
 
     /**
-     * Retrieve currently edited post
+     * Forms string out of getCategoryIds()
      *
-     * @return Oggetto_News_Model_Post
+     * @return string
      */
-    public function getPost()
+    public function getIdsString()
     {
-        return Mage::registry('current_post');
+        return implode(',', $this->getCategoryIds());
     }
 
     /**
@@ -63,7 +63,7 @@ class Oggetto_News_Block_Adminhtml_Post_Edit_Tab_Category extends Oggetto_News_B
     {
         if (is_null($this->_categoryIds)) {
             $categories = $this->getPost()->getSelectedCategories();
-            $ids = array();
+            $ids = [];
             foreach ($categories as $category) {
                 $ids[] = $category->getId();
             }
@@ -73,13 +73,13 @@ class Oggetto_News_Block_Adminhtml_Post_Edit_Tab_Category extends Oggetto_News_B
     }
 
     /**
-     * Forms string out of getCategoryIds()
+     * Retrieve currently edited post
      *
-     * @return string
+     * @return Oggetto_News_Model_Post
      */
-    public function getIdsString()
+    public function getPost()
     {
-        return implode(',', $this->getCategoryIds());
+        return Mage::registry('current_post');
     }
 
     /**
@@ -99,8 +99,8 @@ class Oggetto_News_Block_Adminhtml_Post_Edit_Tab_Category extends Oggetto_News_B
     /**
      * Returns root node
      *
-     * @param Oggetto_News_Model_Category|null $parentNodeCategory
-     * @param int $recursionLevel
+     * @param Oggetto_News_Model_Category $parentNodeCategory Parent category
+     * @param int                         $recursionLevel     Recursion level
      * @return Varien_Data_Tree_Node
      */
     public function getRoot($parentNodeCategory = null, $recursionLevel = 3)
@@ -109,19 +109,87 @@ class Oggetto_News_Block_Adminhtml_Post_Edit_Tab_Category extends Oggetto_News_B
             return $this->getNode($parentNodeCategory, $recursionLevel);
         }
         $root = Mage::registry('category_root');
-        if (is_null($root)) {
-            $rootId = Mage::helper('news/category')->getRootCategoryId();
-            $ids = $this->getSelectedCategoryPathIds($rootId);
-            $tree = Mage::getResourceSingleton('news/category_tree')
-                ->loadByIds($ids, false, false);
-            if ($this->getCategory()) {
-                $tree->loadEnsuredNodes($this->getCategory(), $tree->getNodeById($rootId));
-            }
-            $tree->addCollectionData($this->getCategoryCollection());
-            $root = $tree->getNodeById($rootId);
-            Mage::register('category_root', $root);
+        if (!is_null($root)) {
+            return $root;
         }
+        $rootId = Mage::helper('news/category')->getRootCategoryId();
+        $ids = $this->getSelectedCategoryPathIds($rootId);
+        $tree = Mage::getResourceSingleton('news/category_tree')
+            ->loadByIds($ids, false, false);
+        if ($this->getCategory()) {
+            $tree->loadEnsuredNodes($this->getCategory(), $tree->getNodeById($rootId));
+        }
+        $tree->addCollectionData($this->getCategoryCollection());
+        $root = $tree->getNodeById($rootId);
+        Mage::register('category_root', $root);
         return $root;
+    }
+
+    /**
+     * Return distinct path ids of selected
+     *
+     * @param mixed $rootId Root category Id for context
+     * @return array
+     */
+    public function getSelectedCategoryPathIds($rootId = false)
+    {
+        $ids = [];
+        $categoryIds = $this->getCategoryIds();
+        if (empty($categoryIds)) {
+            return [];
+        }
+        $collection = Mage::getResourceModel('news/category_collection');
+        if ($rootId) {
+            $collection->addFieldToFilter('parent_id', $rootId);
+        } else {
+            $collection->addFieldToFilter('entity_id', ['in' => $categoryIds]);
+        }
+
+        foreach ($collection as $item) {
+            $ids = $this->_addToIds($rootId, $item, $ids);
+        }
+        return $ids;
+    }
+
+    /**
+     * Add to selected category ids
+     *
+     * @param int                         $rootId Root id
+     * @param Oggetto_News_Model_Category $item   Category
+     * @param array                       $ids    Selected category ids
+     * @return array
+     */
+    protected function _addToIds($rootId, $item, array $ids)
+    {
+        if ($rootId && !in_array($rootId, $item->getPathIds())) {
+            return $ids;
+        }
+        foreach ($item->getPathIds() as $id) {
+            if (!in_array($id, $ids)) {
+                $ids[] = $id;
+            }
+        }
+        return $ids;
+    }
+
+    /**
+     * Returns JSON-encoded array of children
+     *
+     * @param int $categoryId Category ID
+     * @return string
+     */
+    public function getCategoryChildrenJson($categoryId)
+    {
+        $category = Mage::getModel('news/category')->load($categoryId);
+        $node = $this->getRoot($category, 1)->getTree()->getNodeById($categoryId);
+        if (!$node || !$node->hasChildren()) {
+            return '[]';
+        }
+        $children = [];
+        foreach ($node->getChildren() as $child) {
+            $children[] = $this->_getNodeJson($child);
+        }
+        return Mage::helper('core')->jsonEncode($children);
     }
 
     /**
@@ -169,86 +237,13 @@ class Oggetto_News_Block_Adminhtml_Post_Edit_Tab_Category extends Oggetto_News_B
     }
 
     /**
-     * Returns array with nodes those are selected (contain current post)
-     *
-     * @return array
-     */
-    protected function _getSelectedNodes()
-    {
-        if ($this->_selectedNodes === null) {
-            $this->_selectedNodes = array();
-            $root = $this->getRoot();
-            foreach ($this->getCategoryIds() as $categoryId) {
-                if ($root) {
-                    $this->_selectedNodes[] = $root->getTree()->getNodeById($categoryId);
-                }
-            }
-        }
-        return $this->_selectedNodes;
-    }
-
-    /**
-     * Returns JSON-encoded array of  children
-     *
-     * @param int $categoryId Category ID
-     * @return string
-     */
-    public function getCategoryChildrenJson($categoryId)
-    {
-        $category = Mage::getModel('news/category')->load($categoryId);
-        $node = $this->getRoot($category, 1)->getTree()->getNodeById($categoryId);
-        if (!$node || !$node->hasChildren()) {
-            return '[]';
-        }
-        $children = array();
-        foreach ($node->getChildren() as $child) {
-            $children[] = $this->_getNodeJson($child);
-        }
-        return Mage::helper('core')->jsonEncode($children);
-    }
-
-    /**
      * Returns URL for loading tree
      *
-     * @param null $expanded Is expanded
      * @return string
      */
-    public function getLoadTreeUrl($expanded = null)
+    public function getLoadTreeUrl()
     {
         return $this->getUrl('*/*/categoriesJson', ['_current' => true]);
-    }
-
-    /**
-     * Return distinct path ids of selected
-     *
-     * @param mixed $rootId Root category Id for context
-     * @return array
-     */
-    public function getSelectedCategoryPathIds($rootId = false)
-    {
-        $ids = [];
-        $categoryIds = $this->getCategoryIds();
-        if (empty($categoryIds)) {
-            return [];
-        }
-        $collection = Mage::getResourceModel('news/category_collection');
-        if ($rootId) {
-            $collection->addFieldToFilter('parent_id', $rootId);
-        } else {
-            $collection->addFieldToFilter('entity_id', ['in' => $categoryIds]);
-        }
-
-        foreach ($collection as $item) {
-            if ($rootId && !in_array($rootId, $item->getPathIds())) {
-                continue;
-            }
-            foreach ($item->getPathIds() as $id) {
-                if (!in_array($id, $ids)) {
-                    $ids[] = $id;
-                }
-            }
-        }
-        return $ids;
     }
 
     /**
@@ -264,5 +259,24 @@ class Oggetto_News_Block_Adminhtml_Post_Edit_Tab_Category extends Oggetto_News_B
             . $this->getUrl('adminhtml/news_category/index', ['id' => $node->getId(), 'clear' => 1])
             . '"><em>' . $this->__(' - Edit') . '</em></a>';
         return $result;
+    }
+
+    /**
+     * Returns array with nodes those are selected (contain current post)
+     *
+     * @return array
+     */
+    protected function _getSelectedNodes()
+    {
+        if ($this->_selectedNodes === null) {
+            $this->_selectedNodes = [];
+            $root = $this->getRoot();
+            if ($root) {
+                foreach ($this->getCategoryIds() as $categoryId) {
+                    $this->_selectedNodes[] = $root->getTree()->getNodeById($categoryId);
+                }
+            }
+        }
+        return $this->_selectedNodes;
     }
 }

@@ -23,30 +23,41 @@
  */
 
 /**
- * Post edit form
+ * Post edit form test
  *
  * @category   Oggetto
  * @package    Oggetto_News
- * @subpackage Block
+ * @subpackage Test
  * @author     Eduard Paliy <epaliy@oggettoweb.com>
  */
-class Oggetto_News_Block_Adminhtml_Post_Edit_Form extends Mage_Adminhtml_Block_Widget_Form
+class Oggetto_News_Test_Block_Adminhtml_Post_Edit_Form extends EcomDev_PHPUnit_Test_Case
 {
     /**
-     * Prepare form
+     * Test prepares form
      *
-     * @return Oggetto_News_Block_Adminhtml_Post_Edit_Form
+     * @return void
      */
-    protected function _prepareForm()
+    public function testPreparesForm()
     {
-        $form = new Varien_Data_Form([
-            'id'      => 'edit_form',
-            'action'  => $this->getUrl('*/*/save', ['id' => $this->getRequest()->getParam('id')]),
-            'method'  => 'post',
-            'enctype' => 'multipart/form-data'
-        ]);
-        $form->setUseContainer(true);
-        $this->setForm($form);
-        return parent::_prepareForm();
+        $block = $this->getBlockMock('news/adminhtml_post_edit_form', ['getUrl']);
+
+        $block->expects($this->any())
+            ->method('getUrl')
+            ->with(
+                $this->equalTo('*/*/save'),
+                $this->anything()
+            )
+            ->will($this->returnValue('foo/bar/save/id/42'));
+
+        $block->toHtml();
+
+        $form = $block->getForm();
+
+        $this->assertEquals('edit_form', $form->getId());
+        $this->assertEquals('foo/bar/save/id/42', $form->getAction());
+        $this->assertEquals('post', $form->getMethod());
+        $this->assertEquals('multipart/form-data', $form->getEnctype());
+        $this->assertTrue($form->getUseContainer());
+
     }
 }

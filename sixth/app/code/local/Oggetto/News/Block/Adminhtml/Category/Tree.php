@@ -245,7 +245,7 @@ class Oggetto_News_Block_Adminhtml_Category_Tree extends Oggetto_News_Block_Admi
         if (is_array($node)) {
             $node = new Varien_Data_Tree_Node($node, 'entity_id', new Varien_Data_Tree);
         }
-        $item = array();
+        $item = [];
         $item['text'] = $this->buildNodeName($node);
         $item['id'] = $node->getId();
         $item['path'] = $node->getData('path');
@@ -258,11 +258,11 @@ class Oggetto_News_Block_Adminhtml_Category_Tree extends Oggetto_News_Block_Admi
         $item['allowDrop'] = true;
         $item['allowDrag'] = true;
         if ((int)$node->getChildrenCount() > 0) {
-            $item['children'] = array();
+            $item['children'] = [];
         }
         $isParent = $this->_isParentSelectedCategory($node);
         if ($node->hasChildren()) {
-            $item['children'] = array();
+            $item['children'] = [];
             if (!($this->getUseAjax() && $node->getLevel() > 1 && !$isParent)) {
                 foreach ($node->getChildren() as $child) {
                     $item['children'][] = $this->_getNodeJson($child, $level + 1);

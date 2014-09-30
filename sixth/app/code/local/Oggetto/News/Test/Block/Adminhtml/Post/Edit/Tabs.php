@@ -79,6 +79,70 @@ class Oggetto_News_Test_Block_Adminhtml_Post_Edit_Tabs extends EcomDev_PHPUnit_T
         $constructor = $reflected->getConstructor();
         $constructor->invoke($block);
     }
+    
+    /**
+     * Test adds tabs
+     * 
+     * @return void
+     */
+    public function testAddsTabs()
+    {
+        $this->replaceByMock('singleton', 'core/session', $this->getModelMock('core/layout', ['start']));
+
+        $this->_mockHelper();
+
+        $layout = $this->getModelMock('core/layout');
+
+        $formBlock = $this->getBlockMock('core/template', ['_toHtml', 'toHtml']);
+
+        $formBlock->expects($this->any())
+            ->method('_toHtml')
+            ->will($this->returnValue('foo'));
+
+        $layout->expects($this->any())
+            ->method('createBlock')
+            ->with($this->anything())
+            ->will($this->returnValue($formBlock));
+
+
+        $this->replaceByMock('singleton', 'core/session', $this->getModelMock('core/session', ['start']));
+
+        $block = $this->getBlockMock('news/adminhtml_post_edit_tabs',
+            ['addTab', '_toHtml', '_afterToHtml', 'getLayout', 'createBlock', 'getUrl']);
+        
+        $block->expects($this->at(1))
+            ->method('addTab')
+            ->with(
+                $this->equalTo('form_post'),
+                $this->equalTo([
+                    'label'   => 'Post',
+                    'title'   => 'Post',
+                    'content' => 'foo'
+                ])
+            );
+
+        $block->expects($this->at(3))
+            ->method('addTab')
+            ->with(
+                $this->equalTo('categories'),
+                $this->equalTo([
+                    'label' => 'Categories',
+                    'url'   => 'bar/baz/categories',
+                    'class' => 'ajax'
+                ])
+            );
+
+        $block->expects($this->any())
+            ->method('getLayout')
+            ->will($this->returnValue($layout));
+        
+        $block->expects($this->once())
+            ->method('getUrl')
+            ->with($this->equalTo('*/*/categories'), $this->equalTo(['_current' => true]))
+            ->will($this->returnValue('bar/baz/categories'));
+
+        $block->toHtml();
+    }
 
     /**
      * Test returns current post
