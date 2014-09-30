@@ -379,4 +379,65 @@ class Oggetto_News_Test_Block_Adminhtml_Post_Edit_Tab_Category extends EcomDev_P
 
         $this->assertEquals('foo/bar/categoriesJson', $block->getLoadTreeUrl());
     }
+
+    /**
+     * Test returns node label
+     *
+     * @param int    $nodeId   Node id
+     * @param string $nodeName Node name
+     * @dataProvider dataProvider
+     * @return void
+     */
+    public function testReturnsNodeLabel($nodeId, $nodeName)
+    {
+        $this->_mockHelper();
+
+        $node = $this->getMock('Varien_Object', ['getId', 'getName']);
+
+        $node->expects($this->any())
+            ->method('getId')
+            ->will($this->returnValue($nodeId));
+
+        $node->expects($this->once())
+            ->method('getName')
+            ->will($this->returnValue($nodeName));
+
+        $block = $this->getBlockMock('news/adminhtml_post_edit_tab_category', ['getUrl', 'escapeHtml']);
+
+        $block->expects($this->once())
+            ->method('getUrl')
+            ->with(
+                $this->equalTo('adminhtml/news_category/index'),
+                $this->equalTo(['id' => $node->getId(), 'clear' => 1])
+            )
+            ->will($this->returnValue('adminhtml/news_category/index/id/' . $nodeId . '/clear/1'));
+
+        $block->expects($this->any())
+            ->method('escapeHtml')
+            ->with($this->anything())
+            ->will($this->returnArgument(0));
+
+        $expected = $nodeName . '<a target="_blank" href="'
+            . 'adminhtml/news_category/index/id/' . $nodeId . '/clear/1'
+            . '"><em> - Edit</em></a>';
+
+        $this->assertEquals($expected, $block->buildNodeName($node));
+    }
+
+    /**
+     * Mock helper for translations
+     *
+     * @return void
+     */
+    protected function _mockHelper()
+    {
+        $helper = $this->getHelperMock('news/data', ['__']);
+
+        $helper->expects($this->any())
+            ->method('__')
+            ->with($this->anything())
+            ->will($this->returnArgument(0));
+
+        $this->replaceByMock('helper', 'news', $helper);
+    }
 }
