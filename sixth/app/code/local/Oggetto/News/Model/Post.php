@@ -75,7 +75,7 @@ class Oggetto_News_Model_Post extends Mage_Core_Model_Abstract
         if ($categoryUrl = $category->getCategoryUrl()) {
             $categoryPrefix = $categoryUrl . '/';
         }
-        return $categoryPrefix . $this->getPostUrl();
+        return $categoryPrefix . $this->getUrlKey();
     }
 
     /**

@@ -49,8 +49,8 @@ class Oggetto_News_Block_Adminhtml_Category_Abstract extends Mage_Adminhtml_Bloc
      */
     public function getCategoryId()
     {
-        if ($this->getCategory()) {
-            return $this->getCategory()->getId();
+        if ($category = $this->getCategory()) {
+            return $category->getId();
         }
         return null;
     }
@@ -66,37 +66,10 @@ class Oggetto_News_Block_Adminhtml_Category_Abstract extends Mage_Adminhtml_Bloc
     }
 
     /**
-     * Get current category path
-     *
-     * @return string
-     */
-    public function getCategoryPath()
-    {
-        if ($this->getCategory()) {
-            return $this->getCategory()->getPath();
-        }
-        return Mage::helper('news/category')->getRootCategoryId();
-    }
-
-    /**
-     * Check if there is a root category
-     *
-     * @return bool
-     */
-    public function hasRootCategory()
-    {
-        $root = $this->getRoot();
-        if ($root && $root->getId()) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * Get the root
      *
-     * @param Oggetto_News_Model_Category|null $parentNodeCategory Parent category
-     * @param int                              $recursionLevel     Recursion level
+     * @param Oggetto_News_Model_Category $parentNodeCategory Parent category
+     * @param int                         $recursionLevel     Recursion level
      * @return Varien_Data_Tree_Node
      */
     public function getRoot($parentNodeCategory = null, $recursionLevel = 3)
@@ -105,48 +78,18 @@ class Oggetto_News_Block_Adminhtml_Category_Abstract extends Mage_Adminhtml_Bloc
             return $this->getNode($parentNodeCategory, $recursionLevel);
         }
         $root = Mage::registry('root');
-        if (is_null($root)) {
-            $rootId = Mage::helper('news/category')->getRootCategoryId();
-            $tree = Mage::getResourceSingleton('news/category_tree')
-                ->load(null, $recursionLevel);
-            if ($this->getCategory()) {
-                $tree->loadEnsuredNodes($this->getCategory(), $tree->getNodeById($rootId));
-            }
-            $tree->addCollectionData($this->getCategoryCollection());
-            $root = $tree->getNodeById($rootId);
-            if ($root && $rootId != Mage::helper('news/category')->getRootCategoryId()) {
-                $root->setIsVisible(true);
-            } elseif ($root && $root->getId() == Mage::helper('news/category')->getRootCategoryId()) {
-                $root->setName(Mage::helper('news')->__('Root'));
-            }
-            Mage::register('root', $root);
-        }
-        return $root;
-    }
-
-    /**
-     * Get and register categories root by specified categories IDs
-     *
-     * @param array $ids Category ids
-     * @return Varien_Data_Tree_Node
-     */
-    public function getRootByIds(array $ids)
-    {
-        $root = Mage::registry('root');
-        if ($root !== null) {
+        if (!is_null($root)) {
             return $root;
         }
-        $categoryTreeResource = Mage::getResourceSingleton('news/category_tree');
-        $ids = $categoryTreeResource->getExistingCategoryIdsBySpecifiedIds($ids);
-        $tree = $categoryTreeResource->loadByIds($ids);
         $rootId = Mage::helper('news/category')->getRootCategoryId();
-        $root = $tree->getNodeById($rootId);
-        if ($root && $rootId != Mage::helper('news/category')->getRootCategoryId()) {
-            $root->setIsVisible(true);
-        } else if ($root && $root->getId() == Mage::helper('news/category')->getRootCategoryId()) {
-            $root->setName(Mage::helper('news')->__('Root'));
+        $tree = Mage::getResourceSingleton('news/category_tree')
+            ->load(null, $recursionLevel);
+        if ($this->getCategory()) {
+            $tree->loadEnsuredNodes($this->getCategory(), $tree->getNodeById($rootId));
         }
         $tree->addCollectionData($this->getCategoryCollection());
+        $root = $tree->getNodeById($rootId);
+        $root->setName(Mage::helper('news')->__('Root'));
         Mage::register('root', $root);
         return $root;
     }
@@ -184,21 +127,6 @@ class Oggetto_News_Block_Adminhtml_Category_Abstract extends Mage_Adminhtml_Bloc
         $params = ['_current' => true];
         $params = array_merge($params, $args);
         return $this->getUrl('*/*/save', $params);
-    }
-
-    /**
-     * Get url for edit
-     *
-     * @return string
-     */
-    public function getEditUrl()
-    {
-        return $this->getUrl("*/news_category/edit", [
-            '_current' => true,
-            '_query'   => false,
-            'id'       => null,
-            'parent'   => null
-        ]);
     }
 
     /**

@@ -143,7 +143,8 @@ class Oggetto_News_Block_Adminhtml_Category_Tree extends Oggetto_News_Block_Admi
     public function getLoadTreeUrl($expanded = null)
     {
         $params = array('_current' => true, 'id' => null, 'store' => null);
-        if ((is_null($expanded) && Mage::getSingleton('admin/session')->getCategoryIsTreeWasExpanded()) || $expanded == true) {
+        if ((is_null($expanded) && Mage::getSingleton('admin/session')->getCategoryIsTreeWasExpanded())
+            || $expanded == true) {
             $params['expand_all'] = true;
         }
         return $this->getUrl('*/*/categoriesJson', $params);
@@ -288,7 +289,7 @@ class Oggetto_News_Block_Adminhtml_Category_Tree extends Oggetto_News_Block_Admi
     }
 
     /**
-     * check if parent is selected
+     * Check if parent is selected
      *
      * @param Varien_Object $node Category node
      * @return bool

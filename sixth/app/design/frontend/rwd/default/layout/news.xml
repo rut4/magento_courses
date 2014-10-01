@@ -53,7 +53,7 @@
             <action method="addItem" ifconfig="news/category/tree"><type>skin_js</type><js>js/news/tree.js</js></action>
         </reference>
         <reference name="left">
-            <block type="news/category_view" name="category_view" template="news/category/view.phtml" />
+            <block type="core/template" name="category_view" template="news/category/view.phtml" />
             <block type="news/category_children" name="category_children" template="news/category/children.phtml" />
         </reference>
         <reference name="content">

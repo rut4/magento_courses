@@ -63,7 +63,7 @@ class Oggetto_News_Test_Block_Category_List extends EcomDev_PHPUnit_Test_Case
         $categories->expects($this->once())
             ->method('setOrder')
             ->with(
-                $this->equalTo('position'),
+                $this->equalTo('main_table.position'),
                 $this->equalTo('asc')
             );
 

@@ -84,7 +84,6 @@ class Oggetto_News_Adminhtml_News_CategoryController extends Mage_Adminhtml_Cont
     {
         $params['_current'] = true;
         $redirect = false;
-        $parentId = (int)$this->getRequest()->getParam('parent');
         $categoryId = (int)$this->getRequest()->getParam('id');
         $_prevCategoryId = Mage::getSingleton('admin/session')->getLastEditedCategory(true);
         if ($_prevCategoryId && !$this->getRequest()->getQuery('isAjax') && !$this->getRequest()->getParam('clear')) {

@@ -260,23 +260,4 @@ class Oggetto_News_Block_Adminhtml_Post_Edit_Tab_Category extends Oggetto_News_B
             . '"><em>' . $this->__(' - Edit') . '</em></a>';
         return $result;
     }
-
-    /**
-     * Returns array with nodes those are selected (contain current post)
-     *
-     * @return array
-     */
-    protected function _getSelectedNodes()
-    {
-        if ($this->_selectedNodes === null) {
-            $this->_selectedNodes = [];
-            $root = $this->getRoot();
-            if ($root) {
-                foreach ($this->getCategoryIds() as $categoryId) {
-                    $this->_selectedNodes[] = $root->getTree()->getNodeById($categoryId);
-                }
-            }
-        }
-        return $this->_selectedNodes;
-    }
 }

@@ -33,11 +33,6 @@
 class Oggetto_News_Block_Adminhtml_Category_Edit_Form extends Oggetto_News_Block_Adminhtml_Category_Abstract
 {
     /**
-     * Additional buttons on category page
-     */
-    protected $_additionalButtons = [];
-
-    /**
      * Class constructor
      */
     public function __construct()
@@ -154,54 +149,6 @@ class Oggetto_News_Block_Adminhtml_Category_Edit_Form extends Oggetto_News_Block
     public function getResetButtonHtml()
     {
         return $this->getChildHtml('reset_button');
-    }
-
-    /**
-     * Retrieve additional buttons html
-     *
-     * @return string
-     */
-    public function getAdditionalButtonsHtml()
-    {
-        $html = '';
-        foreach ($this->_additionalButtons as $childName) {
-            $html .= $this->getChildHtml($childName);
-        }
-        return $html;
-    }
-
-    /**
-     * Add additional button
-     *
-     * @param string $alias  Button alias
-     * @param array  $config Button config
-     * @return Oggetto_News_Block_Adminhtml_Category_Edit_Form
-     */
-    public function addAdditionalButton($alias, $config)
-    {
-        if (isset($config['name'])) {
-            $config['element_name'] = $config['name'];
-        }
-        $this->setChild($alias . '_button',
-            $this->getLayout()->createBlock('adminhtml/widget_button')->addData($config)
-        );
-        $this->_additionalButtons[$alias] = $alias . '_button';
-        return $this;
-    }
-
-    /**
-     * Remove additional button
-     *
-     * @param string $alias Button alias
-     * @return Oggetto_News_Block_Adminhtml_Category_Edit_Form
-     */
-    public function removeAdditionalButton($alias)
-    {
-        if (isset($this->_additionalButtons[$alias])) {
-            $this->unsetChild($this->_additionalButtons[$alias]);
-            unset($this->_additionalButtons[$alias]);
-        }
-        return $this;
     }
 
     /**

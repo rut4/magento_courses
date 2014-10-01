@@ -33,7 +33,7 @@
 class Oggetto_News_Block_Adminhtml_Post_Edit_Tab_Form extends Mage_Adminhtml_Block_Widget_Form
 {
     /**
-     * prepare the form
+     * Prepare the form
      *
      * @return Oggetto_News_Block_Adminhtml_Post_Edit_Tab_Form
      */
@@ -60,11 +60,13 @@ class Oggetto_News_Block_Adminhtml_Post_Edit_Tab_Form extends Mage_Adminhtml_Blo
             'required' => true,
             'class' => 'required-entry'
         ]);
+
         $fieldset->addField('url_key', 'text', [
             'label' => Mage::helper('news')->__('Url key'),
             'name' => 'url_key',
             'note' => Mage::helper('news')->__('Relative to Website Base URL')
         ]);
+
         $fieldset->addField('status', 'select', [
             'label' => Mage::helper('news')->__('Status'),
             'name' => 'status',
@@ -79,17 +81,29 @@ class Oggetto_News_Block_Adminhtml_Post_Edit_Tab_Form extends Mage_Adminhtml_Blo
                 ]
             ]
         ]);
-        $formValues = Mage::registry('current_post')->getDefaultValues();
+
+        return parent::_prepareForm();
+    }
+
+    /**
+     * Initialization form values
+     *
+     * @return Oggetto_News_Block_Adminhtml_Post_Edit_Tab_Form
+     */
+    protected function _initFormValues()
+    {
+        $currentPost = Mage::registry('current_post');
+        $formValues = $currentPost->getDefaultValues();
         if (!is_array($formValues)) {
             $formValues = [];
         }
-        if (Mage::getSingleton('adminhtml/session')->getPostData()) {
-            $formValues = array_merge($formValues, Mage::getSingleton('adminhtml/session')->getPostData());
+        if ($postData = Mage::getSingleton('adminhtml/session')->getPostData()) {
+            $formValues = array_merge($formValues, $postData);
             Mage::getSingleton('adminhtml/session')->setPostData(null);
-        } elseif (Mage::registry('current_post')) {
-            $formValues = array_merge($formValues, Mage::registry('current_post')->getData());
+        } elseif ($currentPost) {
+            $formValues = array_merge($formValues, $currentPost->getData());
         }
-        $form->setValues($formValues);
-        return parent::_prepareForm();
+        $this->getForm()->setValues($formValues);
+        return parent::_initFormValues();
     }
 }

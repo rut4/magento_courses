@@ -70,16 +70,6 @@ class Oggetto_News_Block_Adminhtml_Category_Edit_Tab_Post extends Mage_Adminhtml
     }
 
     /**
-     * Prepare mass action grid
-     *
-     * @return Oggetto_News_Block_Adminhtml_Category_Edit_Tab_Post
-     */
-    protected function _prepareMassaction()
-    {
-        return $this;
-    }
-
-    /**
      * Prepare the grid columns
      *
      * @return Oggetto_News_Block_Adminhtml_Category_Edit_Tab_Post
@@ -94,6 +84,7 @@ class Oggetto_News_Block_Adminhtml_Category_Edit_Tab_Post extends Mage_Adminhtml
             'align' => 'center',
             'index' => 'entity_id'
         ]);
+
         $this->addColumn('title', [
             'header' => Mage::helper('news')->__('Title'),
             'align' => 'left',
@@ -104,6 +95,7 @@ class Oggetto_News_Block_Adminhtml_Category_Edit_Tab_Post extends Mage_Adminhtml
             ],
             'base_link' => 'adminhtml/news_post/edit'
         ]);
+
         $this->addColumn('position', [
             'header' => Mage::helper('news')->__('Position'),
             'name' => 'position',

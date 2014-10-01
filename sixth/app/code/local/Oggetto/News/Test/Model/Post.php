@@ -64,10 +64,10 @@ class Oggetto_News_Test_Model_Post extends EcomDev_PHPUnit_Test_Case
      */
     public function testReturnsPostUrlByCategory($callNumber, $urlKey, $categoryUrl)
     {
-        $post = $this->getModelMock('news/post', ['getPostUrl']);
+        $post = $this->getModelMock('news/post', ['getUrlKey']);
 
         $post->expects($this->once())
-            ->method('getPostUrl')
+            ->method('getUrlKey')
             ->will($this->returnValue($urlKey));
 
         $category = $this->getModelMock('news/category', ['getCategoryUrl']);

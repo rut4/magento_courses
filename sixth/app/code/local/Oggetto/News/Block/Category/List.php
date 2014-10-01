@@ -40,7 +40,7 @@ class Oggetto_News_Block_Category_List extends Mage_Core_Block_Template
         parent::__construct();
         $categories = Mage::getResourceModel('news/category_collection')
             ->addFieldToFilter('status', 1);
-        $categories->setOrder('position', 'asc');
+        $categories->setOrder('main_table.position', 'asc');
         $this->setCategories($categories);
     }
 

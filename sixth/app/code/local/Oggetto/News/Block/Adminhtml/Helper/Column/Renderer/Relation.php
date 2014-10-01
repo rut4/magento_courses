@@ -46,20 +46,47 @@ class Oggetto_News_Block_Adminhtml_Helper_Column_Renderer_Relation
             return parent::render($row);
         }
         $paramsData = $this->getColumn()->getData('params');
-        $params = array();
+        $params = [];
         if (is_array($paramsData)) {
-            foreach ($paramsData as $name => $getter) {
-                if (is_callable(array($row, $getter))) {
-                    $params[$name] = call_user_func(array($row, $getter));
-                }
-            }
+            $params = $this->_addDataToParams($row, $paramsData, $params);
         }
         $staticParamsData = $this->getColumn()->getData('static');
         if (is_array($staticParamsData)) {
-            foreach ($staticParamsData as $key => $value) {
-                $params[$key] = $value;
-            }
+            $params = $this->_addStaticDataToParams($staticParamsData, $params);
         }
         return '<a href="' . $this->getUrl($base, $params) . '" target="_blank">' . $this->_getValue($row) . '</a>';
+    }
+
+    /**
+     * Add data to parameters
+     *
+     * @param Varien_Object $row        Row
+     * @param array         $paramsData Data
+     * @param array         $params     Parameters
+     * @return array
+     */
+    protected function _addDataToParams(Varien_Object $row, array $paramsData, array $params)
+    {
+        foreach ($paramsData as $name => $getter) {
+            if (is_callable([$row, $getter])) {
+                $params[$name] = call_user_func([$row, $getter]);
+            }
+        }
+        return $params;
+    }
+
+    /**
+     * Add static data to params
+     *
+     * @param array $staticParamsData Static data
+     * @param array $params           Parameters
+     * @return array
+     */
+    protected function _addStaticDataToParams(array $staticParamsData, array $params)
+    {
+        foreach ($staticParamsData as $key => $value) {
+            $params[$key] = $value;
+        }
+        return $params;
     }
 }
