@@ -40,7 +40,6 @@ class Oggetto_News_Block_Adminhtml_Category_Tree extends Oggetto_News_Block_Admi
         parent::__construct();
         $this->setTemplate('news/category/tree.phtml');
         $this->setUseAjax(true);
-        $this->_withProductCount = true;
     }
 
     /**
@@ -50,7 +49,7 @@ class Oggetto_News_Block_Adminhtml_Category_Tree extends Oggetto_News_Block_Admi
      */
     protected function _prepareLayout()
     {
-        $addUrl = $this->getUrl("*/*/add", [
+        $addUrl = $this->getUrl('*/*/add', [
             '_current' => true,
             'id'       => null,
             '_query'   => false
@@ -76,6 +75,7 @@ class Oggetto_News_Block_Adminhtml_Category_Tree extends Oggetto_News_Block_Admi
                     'id' => 'add_root_category_button'
                 ])
         );
+
         return parent::_prepareLayout();
     }
 
