@@ -26,7 +26,7 @@
 <config>
     <modules>
         <Oggetto_News>
-            <version>1.0.0</version>
+            <version>1.1.0</version>
         </Oggetto_News>
     </modules>
     <global>
@@ -67,10 +67,15 @@
                     <post_category>
                         <table>oggetto_news_category_post</table>
                     </post_category>
+                    <category_post_index>
+                        <table>oggetto_news_category_post_index</table>
+                    </category_post_index>
+                    <post_category_index>
+                        <table>oggetto_news_category_post_index</table>
+                    </post_category_index>
                 </entities>
             </news_resource>
         </models>
-        <!--events for url routing for example /other -> other categories -->
         <events>
             <controller_front_init_routers>
                 <observers>
@@ -81,6 +86,13 @@
                 </observers>
             </controller_front_init_routers>
         </events>
+        <index>
+            <indexer>
+                <news>
+                    <model>news/indexer_relation</model>
+                </news>
+            </indexer>
+        </index>
     </global>
     <adminhtml>
         <layout>

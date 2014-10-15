@@ -44,6 +44,7 @@ class Oggetto_News_Model_Post extends Mage_Core_Model_Abstract
      * @var string
      */
     protected $_eventPrefix = 'news_post';
+    protected $_cacheTag    = 'news_post';
 
     /**
      * Parameter name in event
@@ -91,6 +92,9 @@ class Oggetto_News_Model_Post extends Mage_Core_Model_Abstract
             $this->setCreatedAt($now);
         }
         $this->setUpdatedAt($now);
+        Mage::getSingleton('index/indexer')->logEvent(
+            $this, self::ENTITY, Mage_Index_Model_Event::TYPE_SAVE
+        );
         return $this;
     }
 
@@ -155,6 +159,9 @@ class Oggetto_News_Model_Post extends Mage_Core_Model_Abstract
     protected function _afterSave()
     {
         $this->getCategoryInstance()->savePostRelation($this);
+        Mage::getSingleton('index/indexer')->indexEvents(
+            self::ENTITY, Mage_Index_Model_Event::TYPE_SAVE
+        );
         return parent::_afterSave();
     }
 
