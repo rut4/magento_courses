@@ -54,11 +54,11 @@ class Oggetto_News_Model_Resource_Indexer_Relation extends Mage_Index_Model_Reso
     {
         $select = $this->_getWriteAdapter()->select();
 
-        $select->from(['post' => $this->getTable('news/post')], ['post_id'])
+        $select->from(['post' => $this->getTable('news/post')], ['post_id' => 'post.entity_id'])
             ->where('post.entity_id IN(?)', $postIds)
-            ->join(['category' => $this->getTable('news/category')], ['category_id'])
+            ->joinCross(['category' => $this->getTable('news/category')], ['category_id' => 'category.entity_id'])
             ->where('category.entity_id IN(?)', $categoryIds)
-            ->columns("CONCAT(category.url_path, '/', post.url_key)");
+            ->columns(['url_path' => "CONCAT(category.url_path, '/', post.url_key)"]);
 
         return $this->_getIndexAdapter()->fetchAll($select);
     }
@@ -86,14 +86,17 @@ class Oggetto_News_Model_Resource_Indexer_Relation extends Mage_Index_Model_Reso
             ['post_id IN(?)' => $postId]
         );
 
-        $categoryIds = $this->_getIndexAdapter()->fetchAll($select);
-        $currentCategories = $categoryIds;
+        $categoryIds = [];
+        $currentCategories = $this->_getIndexAdapter()->fetchAll($select);
         do {
+            $select = $this->_getWriteAdapter()->select();
+
             $select->from(['category' => $this->getTable('news/category')], ['parent_id'])
                 ->where('entity_id IN(?)', $currentCategories)
                 ->where('parent_id != 1');
 
             $fetched = $this->_getIndexAdapter()->fetchAll($select);
+            $currentCategories = $fetched;
             $categoryIds = array_merge($categoryIds, $fetched);
         } while (count($fetched));
 

@@ -50,7 +50,28 @@ class Oggetto_News_Model_Resource_Post extends Oggetto_News_Model_Resource_Entit
      */
     public function checkUrlPath($urlPath)
     {
-        $select = $this->_initCheckUrlPathSelect($urlPath);
+        return $this->_retrievePostIdByPreparedSelect($this->_initCheckUrlPathSelect($urlPath));
+    }
+
+    /**
+     * Check url path in index
+     *
+     * @param string $urlPath Url path
+     * @return string
+     */
+    public function checkUrlPathInIndex($urlPath)
+    {
+        return $this->_retrievePostIdByPreparedSelect($this->_initCheckIndexUrlPathSelect($urlPath));
+    }
+
+    /**
+     * Retrieve post id by url path
+     *
+     * @param Zend_Db_Select $select Prepared select
+     * @return string
+     */
+    protected function _retrievePostIdByPreparedSelect($select)
+    {
         $select->join(['p' => $this->getMainTable()], 'p.entity_id = e.post_id', ['p.entity_id']);
         $select->where('p.status = true');
 
@@ -60,7 +81,6 @@ class Oggetto_News_Model_Resource_Post extends Oggetto_News_Model_Resource_Entit
 
         return $this->_getReadAdapter()->fetchOne($select);
     }
-
 
     /**
      * Init the check select by url path
@@ -72,6 +92,20 @@ class Oggetto_News_Model_Resource_Post extends Oggetto_News_Model_Resource_Entit
     {
         $select = $this->_getReadAdapter()->select()
             ->from(['e' => $this->getTable('news/category_post')], [])
+            ->where('e.url_path = ?', $urlPath);
+        return $select;
+    }
+
+    /**
+     * Init the check index select by url path
+     *
+     * @param string $urlPath Url path
+     * @return Zend_Db_Select
+     */
+    protected function _initCheckIndexUrlPathSelect($urlPath)
+    {
+        $select = $this->_getReadAdapter()->select()
+            ->from(['e' => $this->getTable('news/category_post_index')], [])
             ->where('e.url_path = ?', $urlPath);
         return $select;
     }
