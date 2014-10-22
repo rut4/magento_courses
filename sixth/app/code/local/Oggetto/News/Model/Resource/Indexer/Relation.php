@@ -46,8 +46,8 @@ class Oggetto_News_Model_Resource_Indexer_Relation extends Mage_Index_Model_Reso
     /**
      * Reindex post(s)
      *
-     * @param int $postId     Post id
-     * @param int $categoryId Category id
+     * @param int   $postId     Post id
+     * @param mixed $categoryId Category id
      * @return void
      */
     protected function _reindexEntity($postId = null, $categoryId = null)
@@ -57,7 +57,7 @@ class Oggetto_News_Model_Resource_Indexer_Relation extends Mage_Index_Model_Reso
         $select->from(['relation' => $this->getTable('news/category_post')], ['category_id']);
 
         if (!is_null($postId)) {
-            $select->where('relation.post_id = ?', $postId);
+            $select->where('relation.post_id  = ?', $postId);
         }
 
         if (!is_null($categoryId)) {
@@ -88,13 +88,36 @@ class Oggetto_News_Model_Resource_Indexer_Relation extends Mage_Index_Model_Reso
     /**
      * Reindex post(s)
      *
-     * @param int $postId Post id
+     * @param array $postIds Post ids
      * @return void
      */
-    protected function _reindexPost($postId = null)
+    protected function _reindexPost($postIds = null)
     {
-        $this->_removePostRelations($postId);
-        $this->_reindexEntity($postId);
+        $this->_removePostRelations($postIds);
+        if (is_null($postIds)) {
+            $postIds = $this->_getAllPostIdsWithRelation();
+        }
+        if (!is_array($postIds)) {
+            $postIds = [$postIds];
+        }
+        foreach ($postIds as $_postId) {
+            $this->_reindexEntity($_postId);
+        }
+    }
+
+    /**
+     * Get post ids which have relations with categories
+     *
+     * @return array
+     */
+    protected function _getAllPostIdsWithRelation()
+    {
+        $select = $this->_getReadAdapter()->select();
+
+        $select->from(['relation' => $this->getTable('news/category_post')], ['post_id'])
+            ->distinct(true);
+
+        return $this->_getReadAdapter()->fetchAll($select);
     }
 
     /**
@@ -105,8 +128,9 @@ class Oggetto_News_Model_Resource_Indexer_Relation extends Mage_Index_Model_Reso
      */
     protected function _reindexCategory($categoryId)
     {
-        $this->_removeCategoryRelations($categoryId);
-        $this->_reindexEntity(null, $categoryId);
+        $this->_reindexPost();
+//        $this->_removeCategoryRelations($categoryId);
+//        $this->_reindexEntity(null, $categoryId);
     }
 
     /**
@@ -150,8 +174,8 @@ class Oggetto_News_Model_Resource_Indexer_Relation extends Mage_Index_Model_Reso
     /**
      * Create relations between posts and categories
      *
-     * @param array $postIds     Post ids
-     * @param array $categoryIds Category ids
+     * @param mixed $postIds     Post ids
+     * @param mixed $categoryIds Category ids
      * @return array
      */
     protected function _buildRelations($postIds, $categoryIds)
