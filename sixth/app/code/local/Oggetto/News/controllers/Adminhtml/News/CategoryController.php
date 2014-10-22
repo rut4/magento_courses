@@ -183,6 +183,7 @@ class Oggetto_News_Adminhtml_News_CategoryController extends Mage_Adminhtml_Cont
         $prevNodeId = $this->getRequest()->getPost('aid', false);
         try {
             $category->move($parentNodeId, $prevNodeId);
+            $category->save();
             $this->getResponse()->setBody("SUCCESS");
         } catch (Mage_Core_Exception $e) {
             $this->getResponse()->setBody($e->getMessage());

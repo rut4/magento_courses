@@ -125,6 +125,9 @@ class Oggetto_News_Model_Category extends Mage_Core_Model_Abstract
     protected function _afterSave()
     {
         $this->getPostInstance()->saveCategoryRelation($this);
+        Mage::getSingleton('index/indexer')->processEntityAction(
+            $this, self::ENTITY, Mage_Index_Model_Event::TYPE_SAVE
+        );
         return parent::_afterSave();
     }
 

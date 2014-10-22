@@ -44,47 +44,25 @@ class Oggetto_News_Model_Resource_Indexer_Relation extends Mage_Index_Model_Reso
     }
 
     /**
-     * Create relations between posts and categories
-     *
-     * @param array $postIds     Post ids
-     * @param array $categoryIds Category ids
-     * @return array
-     */
-    protected function _buildRelations($postIds, $categoryIds)
-    {
-        $select = $this->_getWriteAdapter()->select();
-
-        $select->from(['post' => $this->getTable('news/post')], ['post_id' => 'post.entity_id'])
-            ->where('post.entity_id IN(?)', $postIds)
-            ->joinCross(['category' => $this->getTable('news/category')], ['category_id' => 'category.entity_id'])
-            ->where('category.entity_id IN(?)', $categoryIds)
-            ->columns(['url_path' => "CONCAT(category.url_path, '/', post.url_key)"]);
-
-        return $this->_getIndexAdapter()->fetchAll($select);
-    }
-
-    /**
      * Reindex post(s)
      *
-     * @param int $postId Post id
+     * @param int $postId     Post id
+     * @param int $categoryId Category id
      * @return void
      */
-    protected function _reindexPost($postId = null)
+    protected function _reindexEntity($postId = null, $categoryId = null)
     {
         $select = $this->_getWriteAdapter()->select();
 
         $select->from(['relation' => $this->getTable('news/category_post')], ['category_id']);
 
-        if (!is_array($postId)) {
-            $postId = [$postId];
+        if (!is_null($postId)) {
+            $select->where('relation.post_id = ?', $postId);
         }
 
-        $select->where('relation.post_id IN(?)', $postId);
-
-        $this->_getIndexAdapter()->delete(
-            $this->getMainTable(),
-            ['post_id IN(?)' => $postId]
-        );
+        if (!is_null($categoryId)) {
+            $select->where('relation.category_id = ?', $categoryId);
+        }
 
         $categoryIds = [];
         $currentCategories = $this->_getIndexAdapter()->fetchAll($select);
@@ -102,17 +80,109 @@ class Oggetto_News_Model_Resource_Indexer_Relation extends Mage_Index_Model_Reso
 
         $indexRelations = $this->_buildRelations($postId, $categoryIds);
 
-        $this->_getIndexAdapter()->insertMultiple($this->getMainTable(), $indexRelations);
+        if (!empty($indexRelations)) {
+            $this->_getIndexAdapter()->insertMultiple($this->getMainTable(), $indexRelations);
+        }
     }
 
     /**
-     * Reindex all entities
+     * Reindex post(s)
      *
+     * @param int $postId Post id
      * @return void
      */
-    public function reindexAll()
+    protected function _reindexPost($postId = null)
     {
-        //$this->_reindexEntity();
+        $this->_removePostRelations($postId);
+        $this->_reindexEntity($postId);
+    }
+
+    /**
+     * Reindex post(s)
+     *
+     * @param int $categoryId Category id
+     * @return void
+     */
+    protected function _reindexCategory($categoryId)
+    {
+        $this->_removeCategoryRelations($categoryId);
+        $this->_reindexEntity(null, $categoryId);
+    }
+
+    /**
+     * Remove post relations by post id
+     *
+     * @param int $postId Post id
+     * @return void
+     */
+    protected function _removePostRelations($postId)
+    {
+        if (is_null($postId)) {
+            $this->_getIndexAdapter()->delete($this->getMainTable());
+            return;
+        }
+
+        $this->_getIndexAdapter()->delete(
+            $this->getMainTable(),
+            ['post_id = ?' => $postId]
+        );
+    }
+
+    /**
+     * Remove category relations by post id
+     *
+     * @param int $categoryId Category id
+     * @return void
+     */
+    protected function _removeCategoryRelations($categoryId)
+    {
+        if (is_null($categoryId)) {
+            $this->_getIndexAdapter()->delete($this->getMainTable());
+            return;
+        }
+
+        $this->_getIndexAdapter()->delete(
+            $this->getMainTable(),
+            ['category_id = ?' => $categoryId]
+        );
+    }
+
+    /**
+     * Create relations between posts and categories
+     *
+     * @param array $postIds     Post ids
+     * @param array $categoryIds Category ids
+     * @return array
+     */
+    protected function _buildRelations($postIds, $categoryIds)
+    {
+        $select = $this->_getWriteAdapter()->select();
+
+        $select->from(['post' => $this->getTable('news/post')], ['post_id' => 'post.entity_id']);
+        if (!is_null($postIds)) {
+            $select->where('post.entity_id IN(?)', is_array($postIds) ? $postIds : [$postIds]);
+        }
+        $select->joinCross(
+            ['category' => $this->getTable('news/category')],
+            ['category_id' => 'category.entity_id']
+        );
+        if (!is_null($categoryIds)) {
+            $select->where('category.entity_id IN(?)', is_array($categoryIds) ? $categoryIds : [$categoryIds]);
+        }
+        $select->columns(['url_path' => "CONCAT(category.url_path, '/', post.url_key)"]);
+
+        return $this->_getIndexAdapter()->fetchAll($select);
+    }
+
+    /**
+     * Reindex on posts mass action
+     *
+     * @param Mage_Index_Model_Event $event Index event
+     * @return void
+     */
+    public function reindexAll($event)
+    {
+        $this->_reindexPost();
     }
 
     /**
@@ -127,17 +197,6 @@ class Oggetto_News_Model_Resource_Indexer_Relation extends Mage_Index_Model_Reso
     }
 
     /**
-     * Reindex on posts mass action
-     *
-     * @param Mage_Index_Model_Event $event Index event
-     * @return void
-     */
-    public function newsPostMassAction($event)
-    {
-        $this->_reindexPost($event->getData('post_ids'));
-    }
-
-    /**
      * Reindex on category save
      *
      * @param Mage_Index_Model_Event $event Index event
@@ -145,17 +204,6 @@ class Oggetto_News_Model_Resource_Indexer_Relation extends Mage_Index_Model_Reso
      */
     public function newsCategorySave($event)
     {
-        // $this->_reindexCategory($event->getData('category_id'));
-    }
-
-    /**
-     * Reindex on categories mass action
-     *
-     * @param Mage_Index_Model_Event $event Index event
-     * @return void
-     */
-    public function newsCategoryMassAction($event)
-    {
-        // $this->_reindexCategory($event->getData('category_ids'));
+        $this->_reindexCategory($event->getData('category_id'));
     }
 }

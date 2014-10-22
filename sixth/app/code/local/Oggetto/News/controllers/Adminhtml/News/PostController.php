@@ -210,9 +210,11 @@ class Oggetto_News_Adminhtml_News_PostController extends Mage_Adminhtml_Controll
         }
         try {
             foreach ($postIds as $postId) {
-                $post = Mage::getModel('news/post');
-                $post->setId($postId)->delete();
+                Mage::getModel('news/post')->load($postId)
+                    ->setIsMassaction(true)
+                    ->delete();
             }
+            Mage::getModel('news/post_action')->processMassaction($postIds);
             Mage::getSingleton('adminhtml/session')
                 ->addSuccess(
                     Mage::helper('news')->__('Total of %d posts were successfully deleted.',
@@ -267,11 +269,12 @@ class Oggetto_News_Adminhtml_News_PostController extends Mage_Adminhtml_Controll
             return null;
         }
         foreach ($postIds as $postId) {
-            Mage::getSingleton('news/post')->load($postId)
+            Mage::getModel('news/post')->load($postId)
                 ->setStatus($this->getRequest()->getParam('status'))
-                ->setIsMassupdate(true)
+                ->setIsMassaction(true)
                 ->save();
         }
+
         return count($postIds);
     }
 

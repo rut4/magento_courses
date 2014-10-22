@@ -35,15 +35,11 @@ class Oggetto_News_Model_Indexer_Relation extends Mage_Index_Model_Indexer_Abstr
     protected $_matchedEntities = [
         Oggetto_News_Model_Category::ENTITY => [
             Mage_Index_Model_Event::TYPE_REINDEX,
-            Mage_Index_Model_Event::TYPE_SAVE,
-            Mage_Index_Model_Event::TYPE_DELETE,
-            Mage_Index_Model_Event::TYPE_MASS_ACTION
+            Mage_Index_Model_Event::TYPE_SAVE
         ],
         Oggetto_News_Model_Post::ENTITY => [
             Mage_Index_Model_Event::TYPE_REINDEX,
-            Mage_Index_Model_Event::TYPE_SAVE,
-            Mage_Index_Model_Event::TYPE_DELETE,
-            Mage_Index_Model_Event::TYPE_MASS_ACTION
+            Mage_Index_Model_Event::TYPE_SAVE
         ]
     ];
 
@@ -99,7 +95,6 @@ class Oggetto_News_Model_Indexer_Relation extends Mage_Index_Model_Indexer_Abstr
                 $event->setData('post_ids', $entity->getPostIds());
             }
         }
-
     }
 
     /**
